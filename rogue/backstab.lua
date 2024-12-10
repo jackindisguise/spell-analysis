@@ -1,24 +1,24 @@
 -- spell name
-local SPELL_NAME = "Backstab"
+local SPELL_NAME                 = "Backstab"
 
 -- local alias
-local FindTextInTooltip = BONUS_SPELL_INFO.FindTextInTooltip
+local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
 
 -- colors
-local COLOR_YELLOW = "|cFFFFFF40"
-local COLOR_RED = "|cFFFF4040"
-local COLOR_RESET = "|r"
+local COLOR_YELLOW               = "|cFFFFFF40"
+local COLOR_RED                  = "|cFFFF4040"
+local COLOR_RESET                = "|r"
 
 -- bonus damage table
-local RANK_BONUS_TABLE = {}
-RANK_BONUS_TABLE[53] = 15
-RANK_BONUS_TABLE[2589] = 30
-RANK_BONUS_TABLE[2590] = 48
-RANK_BONUS_TABLE[2591] = 69
-RANK_BONUS_TABLE[8721] = 90
-RANK_BONUS_TABLE[11279] = 135
-RANK_BONUS_TABLE[11280] = 165
-RANK_BONUS_TABLE[11281] = 210
+local RANK_BONUS_TABLE           = {}
+RANK_BONUS_TABLE[53]             = 15
+RANK_BONUS_TABLE[2589]           = 30
+RANK_BONUS_TABLE[2590]           = 48
+RANK_BONUS_TABLE[2591]           = 69
+RANK_BONUS_TABLE[8721]           = 90
+RANK_BONUS_TABLE[11279]          = 135
+RANK_BONUS_TABLE[11280]          = 165
+RANK_BONUS_TABLE[11281]          = 210
 
 -- listener for this spell
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)

@@ -1,13 +1,13 @@
 -- spell name
-local SPELL_NAME = "Eviscerate"
+local SPELL_NAME                 = "Eviscerate"
 
 -- local alias
-local FindTextInTooltip = BONUS_SPELL_INFO.FindTextInTooltip
+local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
 
 -- colors
-local COLOR_YELLOW = "|cFFFFFF40"
-local COLOR_RED = "|cFFFF4040"
-local COLOR_RESET = "|r"
+local COLOR_YELLOW               = "|cFFFFFF40"
+local COLOR_RED                  = "|cFFFF4040"
+local COLOR_RESET                = "|r"
 
 -- listener
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
