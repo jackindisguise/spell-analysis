@@ -1,0 +1,10 @@
+## Interface: 11505
+## Version: 1.0.0
+## Title: Spell Damage and Efficiency
+## Notes: Damage and efficiency analysis for spells.
+## Author: jackindisguise
+
+index.lua
+rogue/sinister-strike.lua
+rogue/eviscerate.lua
+rogue/backstab.lua
