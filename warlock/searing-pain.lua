@@ -1,5 +1,5 @@
 -- spell name
-local SPELL_NAME                 = "Shadow Bolt"
+local SPELL_NAME                 = "Searing Pain"
 
 -- local alias
 local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
@@ -9,8 +9,8 @@ local SPELL_TREE_ID              = BONUS_SPELL_INFO.SPELL_TREE_ID
 local ReverseLookupTable         = BONUS_SPELL_INFO.ReverseLookupTable
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 686, 695, 705, 1088, 1106, 7641, 11659, 11660, 11661, 25307 })
-local RANK_COEFF_TABLE           = { 0.14, 0.299, 0.56, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857 }
+local SPELL_ID                   = ReverseLookupTable({ 5676, 17919, 17920, 17921, 17922, 17923 })
+local RANK_COEFF_TABLE           = { 0.396, 0.429, 0.429, 0.429, 0.429, 0.429 }
 
 -- listener for this spell
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
@@ -21,7 +21,7 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
 
     -- calculate damage
     local damagePattern =
-    "Sends a shadowy bolt at the enemy, causing (%d+) to (%d+) Shadow damage."
+    "Inflict searing pain on the enemy target, causing (%d+) to (%d+) Fire damage.  Causes a high amount of threat."
     local damLow, damHigh = FindTextInTooltip(tooltip, damagePattern)
     local damAvg = (damLow + damHigh) / 2
 
@@ -35,6 +35,6 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    AddDamageRangeAnalysis(tooltip, damLow, damHigh, castTime, SPELL_TREE_ID.SHADOW, coeff)
+    AddDamageRangeAnalysis(tooltip, damLow, damHigh, castTime, SPELL_TREE_ID.FIRE, coeff)
     AddManaAnalysis(tooltip, cost, damAvg)
 end

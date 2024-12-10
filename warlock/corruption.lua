@@ -3,34 +3,37 @@ local SPELL_NAME                 = "Corruption"
 
 -- local alias
 local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local SPELL_BONUS_TREE           = BONUS_SPELL_INFO.SPELL_BONUS_TREE
-local COLOR                      = BONUS_SPELL_INFO.COLOR
+local SPELL_TREE_ID              = BONUS_SPELL_INFO.SPELL_TREE_ID
+local AddDamageOverTimeAnalysis  = BONUS_SPELL_INFO.AddDamageOverTimeAnalysis
+local AddManaAnalysis            = BONUS_SPELL_INFO.AddManaAnalysis
+local ReverseLookupTable         = BONUS_SPELL_INFO.ReverseLookupTable
 
 -- spell stuff
-local DOT_TICKS                  = 4
-
--- damage table
-local RANK_DAMAGE_COEFF          = {}
-RANK_DAMAGE_COEFF[172]           = 0.08 -- rank 1
-RANK_DAMAGE_COEFF[6222]          = 0.155
-RANK_DAMAGE_COEFF[6223]          = 0.167
-RANK_DAMAGE_COEFF[7648]          = 0.167
-RANK_DAMAGE_COEFF[11671]         = 0.167 -- rank 5
-RANK_DAMAGE_COEFF[11672]         = 0.167
-RANK_DAMAGE_COEFF[25311]         = 0.167
+local SPELL_ID                   = ReverseLookupTable({ 172, 6222, 6223, 7648, 11671, 11672, 25311 })
+local RANK_COEFF_TABLE           = { 0.08, 0.155, 0.167, 0.167, 0.167, 0.167, 0.167 }
+local DOT_TICKS                  = { 4, 5, 6, 6, 6, 6, 6 }
 
 -- listener for this spell
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
+    local spellRank = SPELL_ID[id]
+    local coeff = RANK_COEFF_TABLE[spellRank]
+    local ticks = DOT_TICKS[spellRank]
 
     -- calculate damage
     local damagePattern =
     "Corrupts the target, causing (%d+) Shadow damage over (%d+) sec."
     local DOTDam, DOTDuration = FindTextInTooltip(tooltip, damagePattern)
-    local bonusDamage = GetSpellBonusDamage(SPELL_BONUS_TREE.SHADOW)
-    local DOTDamSpellBonus = bonusDamage * RANK_DAMAGE_COEFF[id] * DOT_TICKS
-    local finalDam = DOTDam + DOTDamSpellBonus
+    local spellPower = GetSpellBonusDamage(SPELL_TREE_ID.SHADOW)
+    local bonusDamage = spellPower * coeff * ticks
+    local empoweredDamage = DOTDam + bonusDamage
+
+    -- cast time
+    local castTimePattern = "(.+) sec cast"
+    local castTime = 0
+    local castTimeString = FindTextInTooltip(tooltip, castTimePattern)
+    if castTimeString then castTime = tonumber(castTimeString) or 0 end
 
     -- calculcate mana efficiency
     local costPattern = "(%d+) Mana"
@@ -38,34 +41,6 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    tooltip:AddLine(
-        __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage.",
-            {
-                colorDamage = COLOR.DAMAGE,
-                damage = math.floor(finalDam),
-                colorShadow = COLOR.SHADOW,
-                colorReset = COLOR.RESET
-            }),
-        255,
-        255, 255)
-    tooltip:AddLine(
-        __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage per second.",
-            {
-                colorDamage = COLOR.DAMAGE,
-                damage = math.floor(finalDam / DOTDuration),
-                colorShadow = COLOR.SHADOW,
-                colorReset = COLOR.RESET
-            }),
-        255,
-        255, 255)
-    tooltip:AddLine(
-        __("Costs ${colorMana}${cost}${colorReset} per point of damage.",
-            {
-                colorMana = COLOR.MANA,
-                cost = string.format("%.1f mana", cost / finalDam),
-                colorReset = COLOR.RESET,
-                colorDamage = COLOR.DAMAGE,
-            }),
-        255,
-        255, 255)
+    AddDamageOverTimeAnalysis(tooltip, DOTDam, castTime, DOTDuration, ticks, SPELL_TREE_ID.SHADOW, coeff)
+    AddManaAnalysis(tooltip, cost, empoweredDamage)
 end

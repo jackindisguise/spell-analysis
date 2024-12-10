@@ -21,6 +21,7 @@ warlock/immolate.lua
 warlock/curse-of-agony.lua
 warlock/corruption.lua
 warlock/shadow-bolt.lua
+warlock/searing-pain.lua
 
 # eviscerate
 etc/shoot.lua
