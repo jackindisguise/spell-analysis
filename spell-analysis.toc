@@ -3,7 +3,6 @@
 ## Title: Spell Damage and Efficiency
 ## Version: 1.1.0
 ## Notes: Damage and efficiency analysis for spells.
-## IconTexture: Interface\AddOns\spell-analysis\icon.blp
 ## DefaultState: Enabled
 
 # setup stuff
