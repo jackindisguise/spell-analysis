@@ -4,12 +4,7 @@ local SPELL_NAME                 = "Corruption"
 -- local alias
 local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
 local SPELL_BONUS_TREE           = BONUS_SPELL_INFO.SPELL_BONUS_TREE
-
--- colors
-local COLOR_MANA                 = "|cFF60A0FF"
-local COLOR_SHADOW               = "|cFF808080"
-local COLOR_DAMAGE               = "|cFFFF4040"
-local COLOR_RESET                = "|r"
+local COLOR                      = BONUS_SPELL_INFO.COLOR
 
 -- spell stuff
 local DOT_TICKS                  = 4
@@ -46,30 +41,30 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     tooltip:AddLine(
         __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage.",
             {
-                colorDamage = COLOR_DAMAGE,
+                colorDamage = COLOR.DAMAGE,
                 damage = math.floor(finalDam),
-                colorShadow = COLOR_SHADOW,
-                colorReset = COLOR_RESET
+                colorShadow = COLOR.SHADOW,
+                colorReset = COLOR.RESET
             }),
         255,
         255, 255)
     tooltip:AddLine(
         __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage per second.",
             {
-                colorDamage = COLOR_DAMAGE,
+                colorDamage = COLOR.DAMAGE,
                 damage = math.floor(finalDam / DOTDuration),
-                colorShadow = COLOR_SHADOW,
-                colorReset = COLOR_RESET
+                colorShadow = COLOR.SHADOW,
+                colorReset = COLOR.RESET
             }),
         255,
         255, 255)
     tooltip:AddLine(
         __("Costs ${colorMana}${cost}${colorReset} per point of damage.",
             {
-                colorMana = COLOR_MANA,
+                colorMana = COLOR.MANA,
                 cost = string.format("%.1f mana", cost / finalDam),
-                colorReset = COLOR_RESET,
-                colorDamage = COLOR_DAMAGE,
+                colorReset = COLOR.RESET,
+                colorDamage = COLOR.DAMAGE,
             }),
         255,
         255, 255)

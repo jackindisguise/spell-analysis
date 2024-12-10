@@ -3,22 +3,18 @@ local SPELL_NAME                 = "Backstab"
 
 -- local alias
 local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-
--- colors
-local COLOR_YELLOW               = "|cFFFFFF40"
-local COLOR_RED                  = "|cFFFF4040"
-local COLOR_RESET                = "|r"
+local COLOR                      = BONUS_SPELL_INFO.COLOR
 
 -- bonus damage table
-local RANK_BONUS_TABLE           = {}
-RANK_BONUS_TABLE[53]             = 15
-RANK_BONUS_TABLE[2589]           = 30
-RANK_BONUS_TABLE[2590]           = 48
-RANK_BONUS_TABLE[2591]           = 69
-RANK_BONUS_TABLE[8721]           = 90
-RANK_BONUS_TABLE[11279]          = 135
-RANK_BONUS_TABLE[11280]          = 165
-RANK_BONUS_TABLE[11281]          = 210
+local RANK_BONUS_DAMAGE_TABLE    = {}
+RANK_BONUS_DAMAGE_TABLE[53]      = 15
+RANK_BONUS_DAMAGE_TABLE[2589]    = 30
+RANK_BONUS_DAMAGE_TABLE[2590]    = 48
+RANK_BONUS_DAMAGE_TABLE[2591]    = 69
+RANK_BONUS_DAMAGE_TABLE[8721]    = 90
+RANK_BONUS_DAMAGE_TABLE[11279]   = 135
+RANK_BONUS_DAMAGE_TABLE[11280]   = 165
+RANK_BONUS_DAMAGE_TABLE[11281]   = 210
 
 -- listener for this spell
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
@@ -26,11 +22,11 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     local name, id = tooltip:GetSpell()
 
     -- calculate damage
-    local baseLo, baseHi = UnitDamage("player") -- base weapon range of main hand
-    local baseAvg = (baseLo + baseHi) / 2       -- average weapon damage
-    local modifiedAvg = baseAvg * 1.5           -- +50% from backstab
-    local rankBonus = RANK_BONUS_TABLE[id]      -- flat bonus from backstab
-    local avgDamage = modifiedAvg + rankBonus   -- final average
+    local baseLo, baseHi = UnitDamage("player")   -- base weapon range of main hand
+    local baseAvg = (baseLo + baseHi) / 2         -- average weapon damage
+    local modifiedAvg = baseAvg * 1.5             -- +50% from backstab
+    local rankBonus = RANK_BONUS_DAMAGE_TABLE[id] -- flat bonus from backstab
+    local avgDamage = modifiedAvg + rankBonus     -- final average
 
     -- calculcate energy efficiency
     local costPattern = "(%d+) Energy"
@@ -41,19 +37,19 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     tooltip:AddLine(
         __("Deals ${colorRed}${damage}${colorReset} damage on average.",
             {
-                colorRed = COLOR_RED,
+                colorRed = COLOR.DAMAGE,
                 damage = math.floor(avgDamage),
-                colorReset = COLOR_RESET
+                colorReset = COLOR.RESET
             }),
         255,
         255, 255)
     tooltip:AddLine(
         __("Costs ${colorYellow}${cost}${colorReset} per point of damage.",
             {
-                colorYellow = COLOR_YELLOW,
+                colorYellow = COLOR.ENERGY,
                 cost = string.format("%.1f energy", math.floor(cost / avgDamage)),
-                colorReset = COLOR_RESET,
-                colorRed = COLOR_RED
+                colorReset = COLOR.RESET,
+                colorRed = COLOR.DAMAGE
             }),
         255,
         255, 255)

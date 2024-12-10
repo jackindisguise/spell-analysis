@@ -3,11 +3,7 @@ local SPELL_NAME                 = "Eviscerate"
 
 -- local alias
 local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-
--- colors
-local COLOR_YELLOW               = "|cFFFFFF40"
-local COLOR_RED                  = "|cFFFF4040"
-local COLOR_RESET                = "|r"
+local COLOR                      = BONUS_SPELL_INFO.COLOR
 
 -- listener
 BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
@@ -38,8 +34,8 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
         __(
             "Deals [ ${colorRed}${one}${colorReset} / ${colorRed}${two}${colorReset} / ${colorRed}${three}${colorReset} / ${colorRed}${four}${colorReset} / ${colorRed}${five}${colorReset} ] damage on average.",
             {
-                colorRed = COLOR_RED,
-                colorReset = COLOR_RESET,
+                colorRed = COLOR.DAMAGE,
+                colorReset = COLOR.RESET,
                 one = math.floor(oneAvg),
                 two = math.floor(twoAvg),
                 three = math.floor(threeAvg),
@@ -50,13 +46,13 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
         __(
             "Costs [ ${colorYellow}${one}${colorReset} / ${colorYellow}${two}${colorReset} / ${colorYellow}${three}${colorReset} / ${colorYellow}${four}${colorReset} / ${colorYellow}${five}${colorReset} ] energy per point of damage.",
             {
-                colorYellow = COLOR_YELLOW,
+                colorYellow = COLOR.ENERGY,
                 one = string.format("%.1f", cost / oneAvg),
                 two = string.format("%.1f", cost / twoAvg),
                 three = string.format("%.1f", cost / threeAvg),
                 four = string.format("%.1f", cost / fourAvg),
                 five = string.format("%.1f", cost / fiveAvg),
-                colorReset = COLOR_RESET
+                colorReset = COLOR.RESET
             }
         ), 255, 255, 255, true)
 end

@@ -3,11 +3,7 @@ local SPELL_NAME                    = "Sinister Strike"
 
 -- local alias
 local FindTextInTooltip             = BONUS_SPELL_INFO.FindTextInTooltip
-
--- colors
-local COLOR_YELLOW                  = "|cFFFFFF40"
-local COLOR_RED                     = "|cFFFF4040"
-local COLOR_RESET                   = "|r"
+local COLOR                         = BONUS_SPELL_INFO.COLOR
 
 -- other spell info
 local COMBAT_TAB                    = 2
@@ -49,17 +45,17 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME]    = function(tooltip)
     tooltip:AddLine(
         __("Deals ${colorRed}${damage}${colorReset} damage on average.",
             {
-                colorRed = COLOR_RED,
+                colorRed = COLOR.DAMAGE,
                 damage = math.floor(avgDamage),
-                colorReset = COLOR_RESET
+                colorReset = COLOR.RESET
             }), 255,
         255, 255)
     tooltip:AddLine(
         __("Costs ${colorYellow}${cost}${colorReset} per point of damage.",
             {
-                colorYellow = COLOR_YELLOW,
+                colorYellow = COLOR.ENERGY,
                 cost = string.format("%.1f energy", cost / avgDamage),
-                colorReset = COLOR_RESET
+                colorReset = COLOR.RESET
             }),
         255,
         255, 255)
