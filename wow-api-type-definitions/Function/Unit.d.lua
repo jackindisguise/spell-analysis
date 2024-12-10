@@ -446,3 +446,21 @@ function SetPortraitTexture(texture, unit) end
 ---@param path string
 ---@return nil
 function SetPortraitToTexture(texture, path) end
+
+--- STUFF I ADDED! - jackindisguise
+--- possibly use Resistance which already replicates these values?
+
+---@alias SpellTreeID
+---| 1 Physical
+---| 2 Holy
+---| 3 Fire
+---| 4 Nature
+---| 5 Frost
+---| 6 Shadow
+---| 7 Arcane
+
+--- Returns the ranged attack number of the unit.
+---@param spellTreeID SpellTreeID
+---@return number
+---@nodiscard
+function GetSpellBonusDamage(spellTreeID) end
