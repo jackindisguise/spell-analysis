@@ -1,6 +1,6 @@
 -- global data
 BONUS_SPELL_INFO = {}
-BONUS_SPELL_INFO.FUN = {}
+BONUS_SPELL_INFO.FUN = {} -- contains keys associated with spell names
 
 -- simplifies finding text in a tooltip
 -- this may be super unnecessary
