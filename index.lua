@@ -76,6 +76,11 @@ local ReverseLookupTable = function(t)
     return t
 end
 
+-- Display a number as a float with the provided precision, but removes unnecessary 0s from the end.
+local ShortFloat = function(n, precision)
+    return select(1, string.format("%." .. precision .. "f", n):gsub("%.?[0]+$", ""))
+end
+
 -- Analyze spells that do flat damage.
 -- Averages the damage per hit based on on the provided damage range.
 -- Adds a DPS calculation based on the average damage and cast time/cooldown.
@@ -92,7 +97,7 @@ local AddDamageAnalysis = function(tooltip, damage, delayTime, spellTreeID, coef
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", flatEmpowered),
+                damage = ShortFloat(flatEmpowered, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -105,7 +110,7 @@ local AddDamageAnalysis = function(tooltip, damage, delayTime, spellTreeID, coef
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", flatEmpowered / delayTime),
+                damage = ShortFloat(flatEmpowered / delayTime, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -115,11 +120,12 @@ local AddDamageAnalysis = function(tooltip, damage, delayTime, spellTreeID, coef
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage. (+${spellPowerBenefit}%)",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    flatBonus = string.format("%.1f", flatBonus),
+                    flatBonus = ShortFloat(flatBonus, 1),
+                    spellPowerBenefit = ShortFloat(flatBonus / damage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -147,7 +153,7 @@ local AddDamageRangeAnalysis = function(tooltip, low, high, delayTime, spellTree
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", flatEmpowered),
+                damage = ShortFloat(flatEmpowered, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -160,7 +166,7 @@ local AddDamageRangeAnalysis = function(tooltip, low, high, delayTime, spellTree
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", flatEmpowered / delayTime),
+                damage = ShortFloat(flatEmpowered / delayTime, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -170,11 +176,12 @@ local AddDamageRangeAnalysis = function(tooltip, low, high, delayTime, spellTree
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage. (+${spellPowerBenefit}%)",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    flatBonus = string.format("%.1f", flatBonus),
+                    flatBonus = ShortFloat(flatBonus, 1),
+                    spellPowerBenefit = ShortFloat(flatBonus / flatAverage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -196,6 +203,14 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
     local dotEmpowered = damage + dotBonus
     tooltip:AddLine("DoT:")
     tooltip:AddLine(
+        __("${prefix}Ticks once every ${tickDelay} seconds.",
+            {
+                prefix = prefix or STRING.DEFAULT_PREFIX,
+                tickDelay = duration / ticks
+            }),
+        unpack(RGB.WHITE)
+    )
+    tooltip:AddLine(
         __("${prefix}Deals ${colorDamage}${damage}${colorReset} total ${spellColor}${spellWord}${colorReset} damage.",
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
@@ -212,18 +227,10 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", dotEmpowered / ticks),
+                damage = ShortFloat(dotEmpowered / ticks, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
-            }),
-        unpack(RGB.WHITE)
-    )
-    tooltip:AddLine(
-        __("${prefix}Ticks once every ${tickDelay} seconds.",
-            {
-                prefix = prefix or STRING.DEFAULT_PREFIX,
-                tickDelay = duration / ticks
             }),
         unpack(RGB.WHITE)
     )
@@ -233,7 +240,7 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = string.format("%.1f", dotEmpowered / duration),
+                damage = ShortFloat(dotEmpowered / duration, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -243,11 +250,12 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${dotBonus} bonus damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${dotBonus} bonus damage. (+${spellPowerBenefit}%)",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    dotBonus = string.format("%.1f", dotBonus),
+                    dotBonus = ShortFloat(dotBonus, 1),
+                    spellPowerBenefit = ShortFloat(dotBonus / damage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -277,7 +285,7 @@ local AddHybridDamageAnalysis = function(tooltip, immediate, dot, castTime, dura
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = combined,
+                damage = ShortFloat(combined, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -290,7 +298,7 @@ local AddHybridDamageAnalysis = function(tooltip, immediate, dot, castTime, dura
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = math.floor(combined / delayTime),
+                damage = ShortFloat(combined / delayTime, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -300,11 +308,12 @@ local AddHybridDamageAnalysis = function(tooltip, immediate, dot, castTime, dura
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${combinedBonus} bonus damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${combinedBonus} bonus damage.  (+${spellPowerBenefit}%)",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    combinedBonus = string.format("%.1f", combinedBonus),
+                    combinedBonus = ShortFloat(combinedBonus, 1),
+                    spellPowerBenefit = ShortFloat(combinedBonus / (immediate + dot) * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -323,7 +332,7 @@ local AddManaAnalysis = function(tooltip, cost, damage, prefix)
         __("${prefix}Costs ${colorMana}${cost}${colorReset} per point of damage.", {
             prefix = prefix or STRING.DEFAULT_PREFIX,
             colorMana = COLOR.MANA,
-            cost = string.format("%.2f mana", cost / damage),
+            cost = ShortFloat(cost / damage, 2),
             colorReset = COLOR.RESET
         }),
         255,
@@ -332,7 +341,7 @@ local AddManaAnalysis = function(tooltip, cost, damage, prefix)
         __("${prefix}Spell has ${colorMana}${cost}%${colorReset} mana efficiency.", {
             prefix = prefix or STRING.DEFAULT_PREFIX,
             colorMana = COLOR.MANA,
-            cost = string.format("%.2f", (1 - ((cost / damage) - 1)) * 100),
+            cost = ShortFloat((1 - ((cost / damage) - 1)) * 100, 2),
             colorReset = COLOR.RESET
         }),
         255,
@@ -396,6 +405,7 @@ BONUS_SPELL_INFO.STRING                    = STRING
 -- export useful functions
 BONUS_SPELL_INFO.FindTextInTooltip         = FindTextInTooltip
 BONUS_SPELL_INFO.ReverseLookupTable        = ReverseLookupTable
+BONUS_SPELL_INFO.ShortFloat                = ShortFloat
 
 -- export analysis and display functions
 BONUS_SPELL_INFO.AddDamageAnalysis         = AddDamageAnalysis
