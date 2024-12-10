@@ -2,6 +2,18 @@
 BONUS_SPELL_INFO = {}
 BONUS_SPELL_INFO.FUN = {} -- contains keys associated with spell names
 
+-- quick reference
+BONUS_SPELL_INFO.SPELL_BONUS_TREE = {
+    PHYSICAL = 1,
+    HOLY = 2,
+    FIRE = 3,
+    NATURE = 4,
+    FROST = 5,
+    SHADOW = 6,
+    ARCANE = 7
+}
+
+
 -- simplifies finding text in a tooltip
 -- this may be super unnecessary
 -- also stores last/current tooltip region data to avoid unnecessary work in the same call

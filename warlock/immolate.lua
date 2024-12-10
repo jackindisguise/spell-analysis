@@ -50,15 +50,31 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     -- add line
     tooltip:AddLine("\n")
     tooltip:AddLine(
-        string.format("Deals %s%d %sFire%s damage.", COLOR_DAMAGE, finalDam, COLOR_FIRE, COLOR_RESET),
+        __("Deals ${colorDamage}${damage}${colorReset} ${colorFire}Fire${colorReset} damage.",
+            {
+                colorDamage = COLOR_DAMAGE,
+                damage = finalDam,
+                colorFire = COLOR_FIRE,
+                colorReset = COLOR_RESET
+            }),
         unpack(WHITE))
     tooltip:AddLine(
-        string.format("Costs %s%.1f mana%s per point of damage.", COLOR_MANA, cost / finalDam, COLOR_RESET),
+        __("Costs ${colorMana}${manaPerDamage} mana${colorReset} per point of damage.",
+            {
+                colorMana = COLOR_MANA,
+                manaPerDamage = string.format("%.1f", cost / finalDam),
+                colorReset = COLOR_RESET
+            }),
         unpack(WHITE))
     if bonusFireDamage then
         tooltip:AddLine(
-            string.format("Bonus %sFire%s spell damage is %s%d%s.", COLOR_FIRE, COLOR_RESET,
-                COLOR_DAMAGE, bonusFireDamage, COLOR_RESET),
+            __("Bonus ${colorFire}Fire${colorReset} spell damage is ${colorDamage}${bonusFireDamage}${colorReset}.",
+                {
+                    colorFire = COLOR_FIRE,
+                    colorReset = COLOR_RESET,
+                    colorDamage = COLOR_DAMAGE,
+                    bonusFireDamage = bonusFireDamage
+                }),
             unpack(WHITE)
         )
         --[[tooltip:AddLine(

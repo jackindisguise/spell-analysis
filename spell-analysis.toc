@@ -7,6 +7,9 @@
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 
+# setup stuff
+interp.lua
+
 # generates entry points and tables and some functions
 index.lua
 
@@ -14,3 +17,12 @@ index.lua
 rogue/sinister-strike.lua
 rogue/eviscerate.lua
 rogue/backstab.lua
+
+# warlock spells
+warlock/immolate.lua
+warlock/curse-of-agony.lua
+warlock/corruption.lua
+warlock/shadow-bolt.lua
+
+# eviscerate
+etc/shoot.lua

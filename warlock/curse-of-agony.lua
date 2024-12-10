@@ -43,19 +43,30 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     -- add line
     tooltip:AddLine("\n")
     tooltip:AddLine(
-        string.format("Deals %s%d %sShadow%s damage%s.", COLOR_DAMAGE, finalDam, COLOR_SHADOW, COLOR_DAMAGE, COLOR_RESET),
+        __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage.", {
+            colorDamage = COLOR_DAMAGE,
+            damage = finalDam,
+            colorShadow = COLOR_SHADOW,
+            colorReset = COLOR_RESET
+        }),
         255,
         255, 255)
     tooltip:AddLine(
-        string.format("Deals %s%d %sShadow%s damage%s per second.", COLOR_DAMAGE, finalDam / DOTDuration, COLOR_SHADOW,
-            COLOR_DAMAGE,
-            COLOR_RESET),
+        __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage per second.", {
+            colorDamage = COLOR_DAMAGE,
+            damage = finalDam / DOTDuration,
+            colorShadow = COLOR_SHADOW,
+            colorReset = COLOR_RESET
+        }),
         255,
         255, 255)
     tooltip:AddLine(
-        string.format("Costs %s%.1f mana%s per point of %sdamage%s.", COLOR_MANA, cost / finalDam, COLOR_RESET,
-            COLOR_DAMAGE,
-            COLOR_RESET),
+        __("Costs ${colorMana}${cost}${colorReset} per point of ${colorDamage}damage${colorReset}.", {
+            colorMana = COLOR_MANA,
+            cost = string.format("%.1f mana", cost / finalDam),
+            colorReset = COLOR_RESET,
+            colorDamage = COLOR_DAMAGE
+        }),
         255,
         255, 255)
 end
