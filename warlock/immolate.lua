@@ -53,7 +53,7 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
         __("Deals ${colorDamage}${damage}${colorReset} ${colorFire}Fire${colorReset} damage.",
             {
                 colorDamage = COLOR_DAMAGE,
-                damage = finalDam,
+                damage = math.floor(finalDam),
                 colorFire = COLOR_FIRE,
                 colorReset = COLOR_RESET
             }),

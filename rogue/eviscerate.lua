@@ -34,22 +34,29 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
 
     -- add analysis to tooltip
     tooltip:AddLine("\n")
-    tooltip:AddLine(string.format(
-        "Deals [ %s%d%s / %s%d%s / %s%d%s / %s%d%s / %s%d%s ] %sdamage%s on average.",
-        COLOR_RED, oneAvg, COLOR_RESET,
-        COLOR_RED, twoAvg, COLOR_RESET,
-        COLOR_RED, threeAvg, COLOR_RESET,
-        COLOR_RED, fourAvg, COLOR_RESET,
-        COLOR_RED, fiveAvg, COLOR_RESET,
-        COLOR_RED, COLOR_RESET), 255, 255, 255)
+    tooltip:AddLine(
+        __(
+            "Deals [ ${colorRed}${one}${colorReset} / ${colorRed}${two}${colorReset} / ${colorRed}${three}${colorReset} / ${colorRed}${four}${colorReset} / ${colorRed}${five}${colorReset} ] damage on average.",
+            {
+                colorRed = COLOR_RED,
+                colorReset = COLOR_RESET,
+                one = math.floor(oneAvg),
+                two = math.floor(twoAvg),
+                three = math.floor(threeAvg),
+                four = math.floor(fourAvg),
+                five = math.floor(fiveAvg)
+            }), 255, 255, 255)
     tooltip:AddLine(
         string.format(
-            "Costs [ %s%.1f%s / %s%.1f%s / %s%.1f%s / %s%.1f%s / %s%.1f%s ] %senergy%s per point of %sdamage%s.",
-            COLOR_YELLOW, cost / oneAvg, COLOR_RESET,
-            COLOR_YELLOW, cost / twoAvg, COLOR_RESET,
-            COLOR_YELLOW, cost / threeAvg, COLOR_RESET,
-            COLOR_YELLOW, cost / fourAvg, COLOR_RESET,
-            COLOR_YELLOW, cost / fiveAvg, COLOR_RESET,
-            COLOR_YELLOW, COLOR_RESET,
-            COLOR_RED, COLOR_RESET), 255, 255, 255, true)
+            "Costs [ ${colorYellow}${one}${colorReset} / ${colorYellow}${two}${colorReset} / ${colorYellow}${three}${colorReset} / ${colorYellow}${four}${colorReset} / ${colorYellow}${five}${colorReset} ] energy per point of damage.",
+            {
+                colorYellow = COLOR_YELLOW,
+                one = string.format("%.1f", cost / oneAvg),
+                two = string.format("%.1f", cost / twoAvg),
+                three = string.format("%.1f", cost / threeAvg),
+                four = string.format("%.1f", cost / fourAvg),
+                five = string.format("%.1f", cost / fiveAvg),
+                colorReset = COLOR_RESET
+            }
+        ), 255, 255, 255, true)
 end

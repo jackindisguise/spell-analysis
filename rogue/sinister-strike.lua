@@ -46,11 +46,21 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME]    = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    tooltip:AddLine(string.format("Deals %s%d damage%s on average.", COLOR_RED, avgDamage, COLOR_RESET), 255, 255, 255)
     tooltip:AddLine(
-        string.format("Costs %s%.1f energy%s per point of %sdamage%s.", COLOR_YELLOW, cost / avgDamage, COLOR_RESET,
-            COLOR_RED,
-            COLOR_RESET),
+        __("Deals ${colorRed}${damage}${colorReset} damage on average.",
+            {
+                colorRed = COLOR_RED,
+                damage = math.floor(avgDamage),
+                colorReset = COLOR_RESET
+            }), 255,
+        255, 255)
+    tooltip:AddLine(
+        __("Costs ${colorYellow}${cost}${colorReset} per point of damage.",
+            {
+                colorYellow = COLOR_YELLOW,
+                cost = string.format("%.1f energy", cost / avgDamage),
+                colorReset = COLOR_RESET
+            }),
         255,
         255, 255)
 end

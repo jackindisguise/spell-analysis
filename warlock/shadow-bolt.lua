@@ -51,7 +51,7 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
         __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage.",
             {
                 colorDamage = COLOR_DAMAGE,
-                damage = finalDam,
+                damage = math.floor(finalDam),
                 colorShadow = COLOR_SHADOW,
                 colorReset = COLOR_RESET
             }),
@@ -61,7 +61,7 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
         __("Deals ${colorDamage}${damage}${colorReset} ${colorShadow}Shadow${colorReset} damage per second.",
             {
                 colorDamage = COLOR_DAMAGE,
-                damage = finalDam / castTime,
+                damage = math.floor(finalDam / castTime),
                 colorShadow = COLOR_SHADOW,
                 colorReset = COLOR_RESET
             }),
