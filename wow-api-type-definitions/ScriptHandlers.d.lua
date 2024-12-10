@@ -155,6 +155,7 @@
 --- | "OnTooltipCleared"
 --- | "OnTooltipSetDefaultAnchor"
 --- | "OnUpdate"
+--- | "OnTooltipSetSpell"
 
 ---@alias OnScriptLootButton
 --- | "OnChar"
@@ -390,86 +391,115 @@
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function Button:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptCheckButton
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function CheckButton:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptColorSelect
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function ColorSelect:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptDressUpModel
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function DressUpModel:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptEditBox
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function EditBox:SetScript(scriptType, handler) end
+
+---
+---@param scriptType OnScriptEditBox
+---@param handler nil|function nil to remove current handler.
+---@return nil
+function EditBox:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptFrame
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function Frame:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptGameTooltip
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function GameTooltip:SetScript(scriptType, handler) end
+
+------
+---@param scriptType OnScriptGameTooltip
+---@param handler nil|function nil to remove current handler.
+---@return nil
+function GameTooltip:HookScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptLootButton
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function LootButton:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptMessageFrame
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function MessageFrame:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptMinimap
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function Minimap:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptModel
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function Model:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptPlayerModel
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function PlayerModel:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptScrollFrame
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function ScrollFrame:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptScrollingMessageFrame
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function ScrollingMessageFrame:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptSimpleHTML
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function SimpleHTML:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptSlider
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function Slider:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptStatusBar
 ---@param handler nil|function nil to remove current handler.
 ---@return nil
 function StatusBar:SetScript(scriptType, handler) end
+
 ---
 ---@param scriptType OnScriptTabardModel
 ---@param handler nil|function nil to remove current handler.
