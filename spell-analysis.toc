@@ -26,3 +26,4 @@ warlock/shadow-bolt.lua
 
 # eviscerate
 etc/shoot.lua
+etc/throw.lua
