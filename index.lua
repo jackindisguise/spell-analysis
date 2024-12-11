@@ -263,19 +263,24 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
             }),
         unpack(RGB.WHITE)
     )
-    tooltip:AddLine(
-        __(
-            "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per second.",
-            {
-                prefix = prefix or STRING.DEFAULT_PREFIX,
-                colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(dotEmpowered / delayTime, 1),
-                spellColor = spellTreeColor,
-                spellWord = spellTreeWord,
-                colorReset = COLOR.RESET
-            }),
-        unpack(RGB.WHITE)
-    )
+
+    -- don't bother showing this if ticks == duration
+    if delayTime ~= ticks then
+        tooltip:AddLine(
+            __(
+                "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per second.",
+                {
+                    prefix = prefix or STRING.DEFAULT_PREFIX,
+                    colorDamage = COLOR.DAMAGE,
+                    damage = ShortFloat(dotEmpowered / delayTime, 1),
+                    spellColor = spellTreeColor,
+                    spellWord = spellTreeWord,
+                    colorReset = COLOR.RESET
+                }),
+            unpack(RGB.WHITE)
+        )
+    end
+
     if spellPower > 0 then
         tooltip:AddLine(
             __(

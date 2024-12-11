@@ -22,6 +22,7 @@ warlock/curse-of-agony.lua
 warlock/corruption.lua
 warlock/shadow-bolt.lua
 warlock/searing-pain.lua
+warlock/drain-life.lua
 
 # eviscerate
 etc/shoot.lua
