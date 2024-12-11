@@ -120,7 +120,22 @@ local AddDamageAnalysis = function(tooltip, damage, delayTime, spellTreeID, coef
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage. (+${spellPowerBenefit}%)",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} damage.",
+                {
+                    prefix = prefix or STRING.DEFAULT_PREFIX,
+                    spellPower = spellPower,
+                    flatBonus = ShortFloat(flatBonus, 1),
+                    spellPowerBenefit = ShortFloat(flatBonus / damage * 100, 2),
+                    colorDamage = COLOR.DAMAGE,
+                    spellColor = spellTreeColor,
+                    spellWord = spellTreeWord,
+                    colorReset = COLOR.RESET
+                }),
+            unpack(RGB.WHITE)
+        )
+        tooltip:AddLine(
+            __(
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
@@ -176,11 +191,25 @@ local AddDamageRangeAnalysis = function(tooltip, low, high, delayTime, spellTree
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} bonus damage. (+${spellPowerBenefit}%)",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
                     flatBonus = ShortFloat(flatBonus, 1),
+                    spellPowerBenefit = ShortFloat(flatBonus / flatAverage * 100, 2),
+                    colorDamage = COLOR.DAMAGE,
+                    spellColor = spellTreeColor,
+                    spellWord = spellTreeWord,
+                    colorReset = COLOR.RESET
+                }),
+            unpack(RGB.WHITE)
+        )
+        tooltip:AddLine(
+            __(
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                {
+                    prefix = prefix or STRING.DEFAULT_PREFIX,
+                    spellPower = spellPower,
                     spellPowerBenefit = ShortFloat(flatBonus / flatAverage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
@@ -240,7 +269,7 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(dotEmpowered / duration, 1),
+                damage = ShortFloat(dotEmpowered / delayTime, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -250,11 +279,25 @@ local AddDamageOverTimeAnalysis = function(tooltip, damage, castTime, duration, 
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${dotBonus} bonus damage. (+${spellPowerBenefit}%)",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${dotBonus} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
                     dotBonus = ShortFloat(dotBonus, 1),
+                    spellPowerBenefit = ShortFloat(dotBonus / damage * 100, 2),
+                    colorDamage = COLOR.DAMAGE,
+                    spellColor = spellTreeColor,
+                    spellWord = spellTreeWord,
+                    colorReset = COLOR.RESET
+                }),
+            unpack(RGB.WHITE)
+        )
+        tooltip:AddLine(
+            __(
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                {
+                    prefix = prefix or STRING.DEFAULT_PREFIX,
+                    spellPower = spellPower,
                     spellPowerBenefit = ShortFloat(dotBonus / damage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
@@ -308,11 +351,25 @@ local AddHybridDamageAnalysis = function(tooltip, immediate, dot, castTime, dura
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${combinedBonus} bonus damage.  (+${spellPowerBenefit}%)",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${combinedBonus} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
                     combinedBonus = ShortFloat(combinedBonus, 1),
+                    spellPowerBenefit = ShortFloat(combinedBonus / (immediate + dot) * 100, 2),
+                    colorDamage = COLOR.DAMAGE,
+                    spellColor = spellTreeColor,
+                    spellWord = spellTreeWord,
+                    colorReset = COLOR.RESET
+                }),
+            unpack(RGB.WHITE)
+        )
+        tooltip:AddLine(
+            __(
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                {
+                    prefix = prefix or STRING.DEFAULT_PREFIX,
+                    spellPower = spellPower,
                     spellPowerBenefit = ShortFloat(combinedBonus / (immediate + dot) * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
