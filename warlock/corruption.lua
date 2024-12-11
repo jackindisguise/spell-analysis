@@ -1,22 +1,22 @@
 -- spell name
-local SPELL_NAME                  = "Corruption"
+local SPELL_NAME                 = "Corruption"
 
 -- local alias
-local FindTextInTooltip           = SPELL_ANALYSIS.FindTextInTooltip
-local SPELL_TREE_ID               = SPELL_ANALYSIS.SPELL_TREE_ID
-local SPELL_POWER_TYPE            = SPELL_ANALYSIS.SPELL_POWER_TYPE
-local ReverseLookupTable          = SPELL_ANALYSIS.ReverseLookupTable
-local AnalyzeDamageOverTimeSpell  = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
-local AddDamageOverTimeAnalysisv2 = SPELL_ANALYSIS.AddDamageOverTimeAnalysisv2
-local AddPowerAnalysis            = SPELL_ANALYSIS.AddPowerAnalysis
+local FindTextInTooltip          = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID              = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE           = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable         = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageOverTimeSpell = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
+local AddDamageOverTimeAnalysis  = SPELL_ANALYSIS.AddDamageOverTimeAnalysis
+local AddPowerAnalysis           = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
-local SPELL_ID                    = ReverseLookupTable({ 172, 6222, 6223, 7648, 11671, 11672, 25311 })
-local RANK_COEFF_TABLE            = { 0.08, 0.155, 0.167, 0.167, 0.167, 0.167, 0.167 }
-local DOT_TICKS                   = { 4, 5, 6, 6, 6, 6, 6 }
+local SPELL_ID                   = ReverseLookupTable({ 172, 6222, 6223, 7648, 11671, 11672, 25311 })
+local RANK_COEFF_TABLE           = { 0.08, 0.155, 0.167, 0.167, 0.167, 0.167, 0.167 }
+local DOT_TICKS                  = { 4, 5, 6, 6, 6, 6, 6 }
 
 -- listener for this spell
-SPELL_ANALYSIS.FUN[SPELL_NAME]    = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
@@ -44,6 +44,6 @@ SPELL_ANALYSIS.FUN[SPELL_NAME]    = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    AddDamageOverTimeAnalysisv2(tooltip, result)
-    AddPowerAnalysis(tooltip, result)
+    AddDamageOverTimeAnalysis(tooltip, result)
+    AddPowerAnalysis(tooltip, { dot = result })
 end

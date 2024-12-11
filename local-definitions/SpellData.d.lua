@@ -28,8 +28,11 @@ SpellFlatDamageData = {
 
 ---@class SpellDamageRangeData: SpellDamageData
 ---@field low number A low end of the damage.
+---@field empoweredLow number A low end of the empowered damage.
 ---@field high number The high end of the damage.
+---@field empoweredHigh number A high end of the empowered damage.
 ---@field avg number The average damage.
+---@field empoweredAvg number The average empowered damage.
 SpellDamageRangeData = {
 }
 
@@ -45,8 +48,8 @@ SpellDamageOverTimeData = {
 }
 
 ---@class SpellMixin
----@field flat SpellFlatDamageData
----@field range SpellDamageRangeData
----@field dot SpellDamageOverTimeData
+---@field flat nil|SpellFlatDamageData
+---@field dot nil|SpellDamageOverTimeData
+---@field range nil|SpellDamageRangeData
 SpellMixin = {
 }

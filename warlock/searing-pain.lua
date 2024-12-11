@@ -3,10 +3,12 @@ local SPELL_NAME               = "Searing Pain"
 
 -- local alias
 local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
-local AddDamageRangeAnalysis   = SPELL_ANALYSIS.AddDamageRangeAnalysis
-local AddManaAnalysis          = SPELL_ANALYSIS.AddManaAnalysis
 local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE         = SPELL_ANALYSIS.SPELL_POWER_TYPE
 local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageRangeSpell  = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
+local AddDamageRangeAnalysis   = SPELL_ANALYSIS.AddDamageRangeAnalysis
+local AddPowerAnalysis         = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
 local SPELL_ID                 = ReverseLookupTable({ 5676, 17919, 17920, 17921, 17922, 17923 })
@@ -23,7 +25,6 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     local damagePattern =
     "Inflict searing pain on the enemy target, causing (%d+) to (%d+) Fire damage.  Causes a high amount of threat."
     local damLow, damHigh = FindTextInTooltip(tooltip, damagePattern)
-    local damAvg = (damLow + damHigh) / 2
 
     -- cast time
     local castTimePattern = "(.+) sec cast"
@@ -33,8 +34,12 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     local costPattern = "(%d+) Mana"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
+    -- analyze dat shit
+    local result = AnalyzeDamageRangeSpell(damLow, damHigh, castTime, 0, SPELL_TREE_ID.FIRE, SPELL_POWER_TYPE.MANA,
+        cost, coeff)
+
     -- add line
     tooltip:AddLine("\n")
-    AddDamageRangeAnalysis(tooltip, damLow, damHigh, castTime, SPELL_TREE_ID.FIRE, coeff)
-    AddManaAnalysis(tooltip, cost, damAvg)
+    AddDamageRangeAnalysis(tooltip, result)
+    AddPowerAnalysis(tooltip, { range = result })
 end

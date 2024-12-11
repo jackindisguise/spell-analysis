@@ -7,7 +7,7 @@ local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
 local SPELL_POWER_TYPE         = SPELL_ANALYSIS.SPELL_POWER_TYPE
 local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
 local AnalyzeDamageRangeSpell  = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
-local AddDamageRangeAnalysisv2 = SPELL_ANALYSIS.AddDamageRangeAnalysisv2
+local AddDamageRangeAnalysis   = SPELL_ANALYSIS.AddDamageRangeAnalysis
 local AddPowerAnalysis         = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
@@ -40,6 +40,6 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    AddDamageRangeAnalysisv2(tooltip, result)
-    AddPowerAnalysis(tooltip, result)
+    AddDamageRangeAnalysis(tooltip, result)
+    AddPowerAnalysis(tooltip, { range = result })
 end

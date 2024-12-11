@@ -1,23 +1,22 @@
 -- spell name
-local SPELL_NAME                  = "Immolate"
+local SPELL_NAME                 = "Immolate"
 
 -- local alias
-local FindTextInTooltip           = SPELL_ANALYSIS.FindTextInTooltip
-local SPELL_TREE_ID               = SPELL_ANALYSIS.SPELL_TREE_ID
-local SPELL_POWER_TYPE            = SPELL_ANALYSIS.SPELL_POWER_TYPE
-local ReverseLookupTable          = SPELL_ANALYSIS.ReverseLookupTable
-local AnalyzeDamageOverTimeSpell  = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
-local AnalyzeFlatDamageSpell      = SPELL_ANALYSIS.AnalyzeFlatDamageSpell
-local AddDamageOverTimeAnalysisv2 = SPELL_ANALYSIS.AddDamageOverTimeAnalysisv2
-local AddDamageAnalysisv2         = SPELL_ANALYSIS.AddDamageAnalysisv2
-local AddPowerAnalysis            = SPELL_ANALYSIS.AddPowerAnalysis
+local FindTextInTooltip          = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID              = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE           = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable         = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageOverTimeSpell = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
+local AnalyzeFlatDamageSpell     = SPELL_ANALYSIS.AnalyzeFlatDamageSpell
+local AddHybridDamageAnalysis    = SPELL_ANALYSIS.AddHybridDamageAnalysis
+local AddPowerAnalysis           = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- RGB values
-local WHITE                       = { 1, 1, 1 }
+local WHITE                      = { 1, 1, 1 }
 
 -- spell stuff
-local SPELL_ID                    = ReverseLookupTable({ 348, 707, 1094, 2941, 11665, 11667, 11668, 25309 })
-local RANK_COEFF_TABLE            = {
+local SPELL_ID                   = ReverseLookupTable({ 348, 707, 1094, 2941, 11665, 11667, 11668, 25309 })
+local RANK_COEFF_TABLE           = {
     { FLAT_COEFF = 0.058, DOT_COEFF = 0.037 }, -- rank 1
     { FLAT_COEFF = 0.125, DOT_COEFF = 0.081 },
     { FLAT_COEFF = 0.2,   DOT_COEFF = 0.13 },
@@ -27,10 +26,10 @@ local RANK_COEFF_TABLE            = {
     { FLAT_COEFF = 0.2,   DOT_COEFF = 0.13 },
     { FLAT_COEFF = 0.2,   DOT_COEFF = 0.13 } -- rank 8
 }
-local DOT_TICKS                   = 5
+local DOT_TICKS                  = 5
 
 -- listener for this spell
-SPELL_ANALYSIS.FUN[SPELL_NAME]    = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
@@ -59,7 +58,8 @@ SPELL_ANALYSIS.FUN[SPELL_NAME]    = function(tooltip)
 
     -- add line
     tooltip:AddLine("\n")
-    --AddHybridDamageAnalysisv2(tooltip, { flat = resultFlat, dot = resultDOT })
-    AddDamageAnalysisv2(tooltip, resultFlat)
-    AddDamageOverTimeAnalysisv2(tooltip, resultDOT)
+    AddHybridDamageAnalysis(tooltip, { flat = resultFlat, dot = resultDOT })
+    --AddDamageAnalysis(tooltip, resultFlat)
+    --AddDamageOverTimeAnalysis(tooltip, resultDOT)
+    AddPowerAnalysis(tooltip, { flat = resultFlat, dot = resultDOT })
 end
