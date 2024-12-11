@@ -1,18 +1,18 @@
 -- spell name
-local SPELL_NAME                 = "Throw"
+local SPELL_NAME               = "Throw"
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local SPELL_BONUS_TREE           = BONUS_SPELL_INFO.SPELL_BONUS_TREE
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_BONUS_TREE         = SPELL_ANALYSIS.SPELL_BONUS_TREE
 
 -- colors
-local COLOR_MANA                 = "|cFF60A0FF"
-local COLOR_SHADOW               = "|cFF808080"
-local COLOR_DAMAGE               = "|cFFFF4040"
-local COLOR_RESET                = "|r"
+local COLOR_MANA               = "|cFF60A0FF"
+local COLOR_SHADOW             = "|cFF808080"
+local COLOR_DAMAGE             = "|cFFFF4040"
+local COLOR_RESET              = "|r"
 
 -- listener for this spell
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
 
