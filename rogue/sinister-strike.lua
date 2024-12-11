@@ -1,38 +1,39 @@
 -- spell name
-local SPELL_NAME                    = "Sinister Strike"
+local SPELL_NAME               = "Sinister Strike"
+
+---[[
+--- I've kind of realized that there is another way to analyze these spells.
+--- You regenerate 10 energy per second.
+--- This spell costs 45 energy.
+--- That means you can use this spell every 4.5 seconds.
+--- That means its DPS is effectively damage / 4.5.
+--- This presents a complex question about certain systems in the game
+--- and how they tie into damage analysis, which pisses me off a lot.
+---]]
 
 -- local alias
-local FindTextInTooltip             = BONUS_SPELL_INFO.FindTextInTooltip
-local COLOR                         = BONUS_SPELL_INFO.COLOR
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE         = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageRangeSpell  = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
+local AddDamageRangeAnalysisv2 = SPELL_ANALYSIS.AddDamageRangeAnalysisv2
+local AddPowerAnalysis         = SPELL_ANALYSIS.AddPowerAnalysis
 
--- other spell info
-local COMBAT_TAB                    = 2
-local IMPROVED_SINISTER_STRIKE_SLOT = 7
-
--- bonus damage table
-local RANK_BONUS_TABLE              = {}
-RANK_BONUS_TABLE[1752]              = 3
-RANK_BONUS_TABLE[1757]              = 6
-RANK_BONUS_TABLE[1758]              = 10
-RANK_BONUS_TABLE[1759]              = 15
-RANK_BONUS_TABLE[1760]              = 22
-RANK_BONUS_TABLE[8621]              = 33
-RANK_BONUS_TABLE[11293]             = 52
-RANK_BONUS_TABLE[11294]             = 68
-
--- energy cost info
-local BASE_ENERGY_COST              = 45
+-- spell stuff
+local SPELL_ID                 = ReverseLookupTable({ 1752, 1757, 1758, 1759, 1760, 8621, 11293, 11294 })
+local RANK_DAMAGE_TABLE        = { 3, 6, 10, 15, 22, 33, 52, 68 }
 
 -- listener
-BONUS_SPELL_INFO.FUN[SPELL_NAME]    = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
+    local spellRank = SPELL_ID[id]
+    local bonusDamage = RANK_DAMAGE_TABLE[spellRank]
 
     -- calculate damage
-    local baseLo, baseHi = UnitDamage("player") -- base weapon range of main hand
-    local baseAvg = (baseLo + baseHi) / 2       -- average weapon damage
-    local rankBonus = RANK_BONUS_TABLE[id]      -- flat bonus from SS
-    local avgDamage = baseAvg + rankBonus       -- final average damage
+    local baseLow, baseHigh = UnitDamage("player") -- base weapon range of main hand
+    local empoweredLow, empoweredHigh = baseLow + bonusDamage, baseHigh + bonusDamage
 
     -- calculcate energy efficiency
     --local _, _, _, _, rank = GetTalentInfo(COMBAT_TAB, IMPROVED_SINISTER_STRIKE_SLOT)
@@ -40,23 +41,12 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME]    = function(tooltip)
     local costPattern = "(%d+) Energy"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
+    -- analyze
+    local result = AnalyzeDamageRangeSpell(empoweredLow, empoweredHigh, 0, 0, SPELL_TREE_ID.PHYSICAL,
+        SPELL_POWER_TYPE.ENERGY, cost, 0)
+
     -- add line
     tooltip:AddLine("\n")
-    tooltip:AddLine(
-        __("Deals ${colorRed}${damage}${colorReset} damage on average.",
-            {
-                colorRed = COLOR.DAMAGE,
-                damage = math.floor(avgDamage),
-                colorReset = COLOR.RESET
-            }), 255,
-        255, 255)
-    tooltip:AddLine(
-        __("Costs ${colorYellow}${cost}${colorReset} per point of damage.",
-            {
-                colorYellow = COLOR.ENERGY,
-                cost = string.format("%.1f energy", cost / avgDamage),
-                colorReset = COLOR.RESET
-            }),
-        255,
-        255, 255)
+    AddDamageRangeAnalysisv2(tooltip, result)
+    AddPowerAnalysis(tooltip, result)
 end

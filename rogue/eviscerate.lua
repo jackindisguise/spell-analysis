@@ -1,12 +1,18 @@
 -- spell name
-local SPELL_NAME                 = "Eviscerate"
+local SPELL_NAME               = "Eviscerate"
+
+---[[
+--- Finishers are gonna be a bitch to implement.
+--- They consume energy AND combo points.
+--- Annoying.
+---]]
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local COLOR                      = BONUS_SPELL_INFO.COLOR
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local COLOR                    = SPELL_ANALYSIS.COLOR
 
 -- listener
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     local damagePattern = "Finishing move that causes damage per combo point, increased by Attack Power:\r\
 %s*1 point%s*: (%d*)-(%d*) damage\r\
 %s*2 points*: (%d*)-(%d*) damage\r\

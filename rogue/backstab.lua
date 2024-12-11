@@ -1,56 +1,42 @@
 -- spell name
-local SPELL_NAME                 = "Backstab"
+local SPELL_NAME               = "Backstab"
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local COLOR                      = BONUS_SPELL_INFO.COLOR
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE         = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageRangeSpell  = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
+local AddDamageRangeAnalysisv2 = SPELL_ANALYSIS.AddDamageRangeAnalysisv2
+local AddPowerAnalysis         = SPELL_ANALYSIS.AddPowerAnalysis
 
--- bonus damage table
-local RANK_BONUS_DAMAGE_TABLE    = {}
-RANK_BONUS_DAMAGE_TABLE[53]      = 15
-RANK_BONUS_DAMAGE_TABLE[2589]    = 30
-RANK_BONUS_DAMAGE_TABLE[2590]    = 48
-RANK_BONUS_DAMAGE_TABLE[2591]    = 69
-RANK_BONUS_DAMAGE_TABLE[8721]    = 90
-RANK_BONUS_DAMAGE_TABLE[11279]   = 135
-RANK_BONUS_DAMAGE_TABLE[11280]   = 165
-RANK_BONUS_DAMAGE_TABLE[11281]   = 210
+-- spell stuff
+local SPELL_ID                 = ReverseLookupTable({ 53, 2589, 2590, 2591, 8721, 11279, 11280, 11281 })
+local RANK_DAMAGE_TABLE        = { 15, 30, 48, 69, 90, 135, 165, 210 }
 
 -- listener for this spell
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
+    local spellRank = SPELL_ID[id]
+    local bonusDamage = RANK_DAMAGE_TABLE[spellRank]
 
     -- calculate damage
-    local baseLo, baseHi = UnitDamage("player")   -- base weapon range of main hand
-    local baseAvg = (baseLo + baseHi) / 2         -- average weapon damage
-    local modifiedAvg = baseAvg * 1.5             -- +50% from backstab
-    local rankBonus = RANK_BONUS_DAMAGE_TABLE[id] -- flat bonus from backstab
-    local avgDamage = modifiedAvg + rankBonus     -- final average
+    local baseLow, baseHigh = UnitDamage("player") -- base weapon range of main hand
+    local empoweredLow, empoweredHigh = baseLow * 1.5 + bonusDamage, baseHigh * 1.5 + bonusDamage
 
     -- calculcate energy efficiency
+    --local _, _, _, _, rank = GetTalentInfo(COMBAT_TAB, IMPROVED_SINISTER_STRIKE_SLOT)
+    --local cost = BASE_ENERGY_COST - (3 * rank) -- -3 energy per level of ISS
     local costPattern = "(%d+) Energy"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
+    -- analyze
+    local result = AnalyzeDamageRangeSpell(empoweredLow, empoweredHigh, 0, 0, SPELL_TREE_ID.PHYSICAL,
+        SPELL_POWER_TYPE.ENERGY, cost, 0)
+
     -- add line
     tooltip:AddLine("\n")
-    tooltip:AddLine(
-        __("Deals ${colorRed}${damage}${colorReset} damage on average.",
-            {
-                colorRed = COLOR.DAMAGE,
-                damage = math.floor(avgDamage),
-                colorReset = COLOR.RESET
-            }),
-        255,
-        255, 255)
-    tooltip:AddLine(
-        __("Costs ${colorYellow}${cost}${colorReset} per point of damage.",
-            {
-                colorYellow = COLOR.ENERGY,
-                cost = string.format("%.1f energy", math.floor(cost / avgDamage)),
-                colorReset = COLOR.RESET,
-                colorRed = COLOR.DAMAGE
-            }),
-        255,
-        255, 255)
+    AddDamageRangeAnalysisv2(tooltip, result)
+    AddPowerAnalysis(tooltip, result)
 end

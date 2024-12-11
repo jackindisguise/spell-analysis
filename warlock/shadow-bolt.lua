@@ -1,19 +1,21 @@
 -- spell name
-local SPELL_NAME                 = "Shadow Bolt"
+local SPELL_NAME               = "Shadow Bolt"
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local AddDamageRangeAnalysis     = BONUS_SPELL_INFO.AddDamageRangeAnalysis
-local AddManaAnalysis            = BONUS_SPELL_INFO.AddManaAnalysis
-local SPELL_TREE_ID              = BONUS_SPELL_INFO.SPELL_TREE_ID
-local ReverseLookupTable         = BONUS_SPELL_INFO.ReverseLookupTable
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE         = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageRangeSpell  = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
+local AddDamageRangeAnalysisv2 = SPELL_ANALYSIS.AddDamageRangeAnalysisv2
+local AddPowerAnalysis         = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 686, 695, 705, 1088, 1106, 7641, 11659, 11660, 11661, 25307 })
-local RANK_COEFF_TABLE           = { 0.14, 0.299, 0.56, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857 }
+local SPELL_ID                 = ReverseLookupTable({ 686, 695, 705, 1088, 1106, 7641, 11659, 11660, 11661, 25307 })
+local RANK_COEFF_TABLE         = { 0.14, 0.299, 0.56, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857, 0.857 }
 
 -- listener for this spell
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
@@ -23,7 +25,6 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     local damagePattern =
     "Sends a shadowy bolt at the enemy, causing (%d+) to (%d+) Shadow damage."
     local damLow, damHigh = FindTextInTooltip(tooltip, damagePattern)
-    local damAvg = (damLow + damHigh) / 2
 
     -- cast time
     local castTimePattern = "(.+) sec cast"
@@ -33,8 +34,12 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     local costPattern = "(%d+) Mana"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
+    -- analyze dat shit
+    local result = AnalyzeDamageRangeSpell(damLow, damHigh, castTime, 0, SPELL_TREE_ID.SHADOW, SPELL_POWER_TYPE.MANA,
+        cost, coeff)
+
     -- add line
     tooltip:AddLine("\n")
-    AddDamageRangeAnalysis(tooltip, damLow, damHigh, castTime, SPELL_TREE_ID.SHADOW, coeff)
-    AddManaAnalysis(tooltip, cost, damAvg)
+    AddDamageRangeAnalysisv2(tooltip, result)
+    AddPowerAnalysis(tooltip, result)
 end

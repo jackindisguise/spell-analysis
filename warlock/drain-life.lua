@@ -11,19 +11,21 @@ local SPELL_NAME = "Drain Life"
 ]]
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local SPELL_TREE_ID              = BONUS_SPELL_INFO.SPELL_TREE_ID
-local AddDamageOverTimeAnalysis  = BONUS_SPELL_INFO.AddDamageOverTimeAnalysis
-local AddManaAnalysis            = BONUS_SPELL_INFO.AddManaAnalysis
-local ReverseLookupTable         = BONUS_SPELL_INFO.ReverseLookupTable
+local FindTextInTooltip           = SPELL_ANALYSIS.FindTextInTooltip
+local SPELL_TREE_ID               = SPELL_ANALYSIS.SPELL_TREE_ID
+local SPELL_POWER_TYPE            = SPELL_ANALYSIS.SPELL_POWER_TYPE
+local ReverseLookupTable          = SPELL_ANALYSIS.ReverseLookupTable
+local AnalyzeDamageOverTimeSpell  = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
+local AddDamageOverTimeAnalysisv2 = SPELL_ANALYSIS.AddDamageOverTimeAnalysisv2
+local AddPowerAnalysis            = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 689, 699, 709, 7651, 11699, 11700 })
-local RANK_COEFF_TABLE           = { 0.078, 0.1, 0.1, 0.1, 0.1, 0.1 }
-local DOT_TICKS                  = 5
+local SPELL_ID                    = ReverseLookupTable({ 689, 699, 709, 7651, 11699, 11700 })
+local RANK_COEFF_TABLE            = { 0.078, 0.1, 0.1, 0.1, 0.1, 0.1 }
+local DOT_TICKS                   = 5
 
 -- listener for this spell
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME]    = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
@@ -34,9 +36,6 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     local damagePattern =
     "Transfers (%d+) health every second from the target to the caster.  Lasts (%d+) sec."
     local DOTDam, DOTDuration = FindTextInTooltip(tooltip, damagePattern)
-    local spellPower = GetSpellBonusDamage(SPELL_TREE_ID.SHADOW)
-    local bonusDamage = spellPower * coeff * ticks
-    local empoweredDamage = DOTDam + bonusDamage
 
     -- cast time
     local castTime = 0
@@ -45,8 +44,12 @@ BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
     local costPattern = "(%d+) Mana"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
+    -- do stuff
+    local result = AnalyzeDamageOverTimeSpell(DOTDam * DOTDuration, DOTDuration, ticks, 0, 0, SPELL_TREE_ID.SHADOW,
+        SPELL_POWER_TYPE.MANA, cost, coeff)
+
     -- add line
     tooltip:AddLine("\n")
-    AddDamageOverTimeAnalysis(tooltip, DOTDam, castTime, DOTDuration, ticks, SPELL_TREE_ID.SHADOW, coeff)
-    AddManaAnalysis(tooltip, cost, empoweredDamage)
+    AddDamageOverTimeAnalysisv2(tooltip, result)
+    AddPowerAnalysis(tooltip, result)
 end

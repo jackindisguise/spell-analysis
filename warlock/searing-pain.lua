@@ -1,19 +1,19 @@
 -- spell name
-local SPELL_NAME                 = "Searing Pain"
+local SPELL_NAME               = "Searing Pain"
 
 -- local alias
-local FindTextInTooltip          = BONUS_SPELL_INFO.FindTextInTooltip
-local AddDamageRangeAnalysis     = BONUS_SPELL_INFO.AddDamageRangeAnalysis
-local AddManaAnalysis            = BONUS_SPELL_INFO.AddManaAnalysis
-local SPELL_TREE_ID              = BONUS_SPELL_INFO.SPELL_TREE_ID
-local ReverseLookupTable         = BONUS_SPELL_INFO.ReverseLookupTable
+local FindTextInTooltip        = SPELL_ANALYSIS.FindTextInTooltip
+local AddDamageRangeAnalysis   = SPELL_ANALYSIS.AddDamageRangeAnalysis
+local AddManaAnalysis          = SPELL_ANALYSIS.AddManaAnalysis
+local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
+local ReverseLookupTable       = SPELL_ANALYSIS.ReverseLookupTable
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 5676, 17919, 17920, 17921, 17922, 17923 })
-local RANK_COEFF_TABLE           = { 0.396, 0.429, 0.429, 0.429, 0.429, 0.429 }
+local SPELL_ID                 = ReverseLookupTable({ 5676, 17919, 17920, 17921, 17922, 17923 })
+local RANK_COEFF_TABLE         = { 0.396, 0.429, 0.429, 0.429, 0.429, 0.429 }
 
 -- listener for this spell
-BONUS_SPELL_INFO.FUN[SPELL_NAME] = function(tooltip)
+SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
