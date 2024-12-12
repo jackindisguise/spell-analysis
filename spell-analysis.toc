@@ -1,7 +1,7 @@
 ## Interface: 11505
 ## Author: jackindisguise
 ## Title: Spell Damage and Efficiency
-## Version: 1.1.0
+## Version: 1.2.0
 ## Notes: Damage and efficiency analysis for spells.
 ## DefaultState: Enabled
 
