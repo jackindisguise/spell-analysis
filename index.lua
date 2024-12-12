@@ -266,7 +266,7 @@ local AddFlatDamageAnalysis = function(tooltip, data, prefix, header)
     local spellTreeWord = SPELL_TREE_WORD[data.spellTreeID]
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
     if header == true or header == nil then
-        tooltip:AddLine("Flat:")
+        tooltip:AddLine("Flat Damage:")
     else
         tooltip:AddLine(header)
     end
@@ -338,7 +338,7 @@ local AddDamageRangeAnalysis = function(tooltip, data, prefix, header)
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
     local spellPower = GetSpellBonusDamage(data.spellTreeID)
     if header == true or header == nil then
-        tooltip:AddLine("Range:")
+        tooltip:AddLine("Damage Range:")
     else
         tooltip:AddLine(header)
     end
@@ -411,7 +411,7 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
     local spellPower = GetSpellBonusDamage(data.spellTreeID)
     if header == true or header == nil then
-        tooltip:AddLine("DoT:")
+        tooltip:AddLine("Damage over Time:")
     else
         tooltip:AddLine(header)
     end
@@ -424,12 +424,20 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
         unpack(RGB.WHITE)
     )
     tooltip:AddLine(
+        __("${prefix}Ticks a total of ${ticks} times.",
+            {
+                prefix = prefix or STRING.DEFAULT_PREFIX,
+                ticks = data.ticks
+            }),
+        unpack(RGB.WHITE)
+    )
+    tooltip:AddLine(
         __(
             "${prefix}Deals ${colorDamage}${damage}${colorReset} total ${spellColor}${spellWord}${colorReset} damage.",
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = data.empoweredDamage,
+                damage = ShortFloat(data.empoweredDamage, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET

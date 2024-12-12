@@ -27,6 +27,11 @@ mage/fireball.lua
 mage/frostbolt.lua
 mage/fire-blast.lua
 
+# Priest spells
+priest/mind-blast.lua
+priest/smite.lua
+priest/shadow-word-pain.lua
+
 # Generic spells
 etc/shoot.lua
 etc/throw.lua
