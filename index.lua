@@ -30,6 +30,7 @@ local COLOR = {
 
 -- spell tree IDs
 local SPELL_TREE_ID = {
+    UNKNOWN = 0,
     PHYSICAL = 1,
     HOLY = 2,
     FIRE = 3,
@@ -50,6 +51,8 @@ local SPELL_TREE_WORD = {
     "Arcane"
 }
 
+SPELL_TREE_WORD[0] = "Unknown"
+
 -- common colors for spell tree words
 local SPELL_TREE_COLOR = {
     COLOR.PHYSICAL,
@@ -60,6 +63,8 @@ local SPELL_TREE_COLOR = {
     COLOR.SHADOW,
     COLOR.ARCANE
 }
+
+SPELL_TREE_COLOR[0] = COLOR.SHADOW
 
 local SPELL_POWER_TYPE = {
     MANA = 0,
@@ -103,11 +108,46 @@ local ShortFloat = function(n, precision)
     return select(1, string.format("%." .. precision .. "f", n):gsub("%.?[0]+$", ""))
 end
 
+-- Simple templating system for strings that doesn't rely on `string.format()`.
+local __ = function(s, tab)
+    return (s:gsub('($%b{})', function(w) return tab[w:sub(3, -2)] or w end))
+end
+
+-- Simplifies finding text in a tooltip.
+-- Stores the last tooltip region data to avoid unnecessary work in the same call.
+local lastTooltip, lastTooltipRegions = nil, {}
+local FindTextInTooltip = function(tooltip, pattern)
+    -- handle saved region data
+    local regions
+    if lastTooltip == tooltip then
+        regions = lastTooltipRegions
+    else -- generate new regions
+        regions = { tooltip:GetRegions() }
+        lastTooltip = tooltip
+        lastTooltipRegions = regions
+    end
+
+    -- iterate over regions with text
+    for k, v in pairs(regions) do
+        if v and v:GetObjectType() == "FontString" then
+            local text = v:GetText()
+            if text then
+                -- check for matches and return them
+                local result = { string.match(v:GetText(), pattern) }
+                if result[1] then
+                    return unpack(result)
+                end
+            end
+        end
+    end
+end
+
+--- Analyze damage-range-type spells and return the analysis data table.
 ---@return SpellDamageRangeData data
 local AnalyzeDamageRangeSpell = function(low, high, castTime, cooldown, spellTreeID, spellPowerType, spellPowerCost,
                                          coeff)
     local actualCooldown = math.max(cooldown, GCD)
-    local spellPower = GetSpellBonusDamage(spellTreeID)
+    local spellPower = spellTreeID == 0 and 0 or GetSpellBonusDamage(spellTreeID)
     local spellPowerDamage = spellPower * coeff
     local avg = (low + high) / 2
     local delayTime = math.max(castTime, actualCooldown)
@@ -142,11 +182,13 @@ local AnalyzeDamageRangeSpell = function(low, high, castTime, cooldown, spellTre
     }
 end
 
+--- Analyze flat-damage-type spells and return the analysis data table.
 ---@return SpellFlatDamageData data
 local AnalyzeFlatDamageSpell = function(damage, castTime, cooldown, spellTreeID, spellPowerType,
                                         spellPowerCost, coeff)
     local actualCooldown = math.max(cooldown, GCD)
-    local spellPower = GetSpellBonusDamage(spellTreeID)
+    local spellPower = (spellTreeID == SPELL_TREE_ID.PHYSICAL and UnitAttackPower("player")) or
+        GetSpellBonusDamage(spellTreeID)
     local spellPowerDamage = spellPower * coeff
     local delayTime = math.max(castTime, actualCooldown)
     local baseDPS = damage / delayTime
@@ -174,6 +216,7 @@ local AnalyzeFlatDamageSpell = function(damage, castTime, cooldown, spellTreeID,
     }
 end
 
+--- Analyze damage-over-time-type spells and return the analysis data table.
 ---@return SpellDamageOverTimeData data
 local AnalyzeDamageOverTimeSpell = function(damage, duration, ticks, castTime, cooldown, spellTreeID,
                                             spellPowerType,
@@ -215,23 +258,25 @@ end
 
 -- Analyze spells that do flat damage.
 -- Averages the damage per hit based on on the provided damage range.
--- Adds a DPS calculation based on the average damage and cast time/cooldown.
+-- Adds a DPS calculation based on the average damage and delay time.
+-- Also calculcates bonus damage from spell power ("spell bonus damage").
 ---@param tooltip GameTooltip
 ---@param data SpellFlatDamageData
-local AddDamageAnalysis = function(tooltip, data, prefix)
+local AddFlatDamageAnalysis = function(tooltip, data, prefix, header)
     local spellTreeWord = SPELL_TREE_WORD[data.spellTreeID]
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
-    local spellPower = GetSpellBonusDamage(data.spellTreeID)
-    local flatBonus = (spellPower * data.coefficient)
-    local flatEmpowered = data.damage + flatBonus
-    tooltip:AddLine("Flat:")
+    if header == true or header == nil then
+        tooltip:AddLine("Flat:")
+    else
+        tooltip:AddLine(header)
+    end
     tooltip:AddLine(
         __(
             "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage.",
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(flatEmpowered, 1),
+                damage = ShortFloat(data.empoweredDamage, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -244,21 +289,21 @@ local AddDamageAnalysis = function(tooltip, data, prefix)
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(flatEmpowered / data.delayTime, 1),
+                damage = ShortFloat(data.empoweredDPS, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
             }),
         unpack(RGB.WHITE)
     )
-    if spellPower > 0 then
+    if data.spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${flatBonus}${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
-                    spellPower = spellPower,
-                    flatBonus = ShortFloat(flatBonus, 1),
+                    spellPower = data.spellPower,
+                    flatBonus = ShortFloat(data.spellPowerDamage, 1),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -268,11 +313,11 @@ local AddDamageAnalysis = function(tooltip, data, prefix)
         )
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${spellPowerBenefit}%${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
-                    spellPower = spellPower,
-                    spellPowerBenefit = ShortFloat(flatBonus / data.damage * 100, 2),
+                    spellPower = data.spellPower,
+                    spellPowerBenefit = ShortFloat(data.spellPowerDamage / data.damage * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -288,21 +333,22 @@ end
 -- Adds a DPS calculation based on the average damage and cast time/cooldown.
 ---@param tooltip GameTooltip
 ---@param data SpellDamageRangeData
-local AddDamageRangeAnalysis = function(tooltip, data, prefix)
+local AddDamageRangeAnalysis = function(tooltip, data, prefix, header)
     local spellTreeWord = SPELL_TREE_WORD[data.spellTreeID]
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
     local spellPower = GetSpellBonusDamage(data.spellTreeID)
-    local flatAverage = (data.low + data.high) / 2
-    local flatBonus = (data.spellPower * data.coefficient)
-    local flatEmpowered = flatAverage + flatBonus
-    tooltip:AddLine("Range:")
+    if header == true or header == nil then
+        tooltip:AddLine("Range:")
+    else
+        tooltip:AddLine(header)
+    end
     tooltip:AddLine(
         __(
             "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage on average.",
             {
                 prefix = prefix or STRING.DEFAULT_PREFIX,
                 colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(flatEmpowered, 1),
+                damage = ShortFloat(data.empoweredAvg, 1),
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
@@ -316,7 +362,7 @@ local AddDamageRangeAnalysis = function(tooltip, data, prefix)
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     colorDamage = COLOR.DAMAGE,
-                    damage = ShortFloat(flatEmpowered / data.delayTime, 1),
+                    damage = ShortFloat(data.empoweredDPS, 1),
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
                     colorReset = COLOR.RESET
@@ -327,12 +373,11 @@ local AddDamageRangeAnalysis = function(tooltip, data, prefix)
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${flatBonus}${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    flatBonus = ShortFloat(flatBonus, 1),
-                    spellPowerBenefit = ShortFloat(flatBonus / flatAverage * 100, 2),
+                    flatBonus = ShortFloat(data.spellPowerDamage, 1),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -342,11 +387,11 @@ local AddDamageRangeAnalysis = function(tooltip, data, prefix)
         )
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${spellPowerBenefit}%${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
-                    spellPowerBenefit = ShortFloat(flatBonus / flatAverage * 100, 2),
+                    spellPowerBenefit = ShortFloat(data.spellPowerDamage / data.avg * 100, 2),
                     colorDamage = COLOR.DAMAGE,
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
@@ -361,11 +406,15 @@ end
 -- Adds a DPS calculation based on the damage and cast time/duration of the spell/cooldown.
 ---@param tooltip GameTooltip
 ---@param data SpellDamageOverTimeData
-local AddDamageOverTimeAnalysis = function(tooltip, data, prefix)
+local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
     local spellTreeWord = SPELL_TREE_WORD[data.spellTreeID]
     local spellTreeColor = SPELL_TREE_COLOR[data.spellTreeID]
     local spellPower = GetSpellBonusDamage(data.spellTreeID)
-    tooltip:AddLine("DoT:")
+    if header == true or header == nil then
+        tooltip:AddLine("DoT:")
+    else
+        tooltip:AddLine(header)
+    end
     tooltip:AddLine(
         __("${prefix}Ticks once every ${tickDelay} seconds.",
             {
@@ -420,7 +469,7 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix)
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${dotBonus} damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${dotBonus}${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
@@ -434,7 +483,7 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix)
         )
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${spellPowerBenefit}%${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
@@ -452,11 +501,16 @@ end
 ---@param tooltip GameTooltip
 ---@param data SpellMixin
 ---@param prefix string|nil
-local AddHybridDamageAnalysis = function(tooltip, data, prefix)
+local AddHybridDamageAnalysis = function(tooltip, data, prefix, header)
     local something = data.dot or data.flat or data.range -- dot first is important
     -- this ensures future attempts to access delayTime will find the dot's delayTime
     -- this is important for DPS accuracy
     if not something then return end
+
+    -- add individual analysis
+    if data.flat then AddFlatDamageAnalysis(tooltip, data.flat, prefix) end
+    if data.range then AddDamageRangeAnalysis(tooltip, data.range, prefix) end
+    if data.dot then AddDamageOverTimeAnalysis(tooltip, data.dot, prefix) end
 
     -- add combined analysis
     local spellTreeWord = SPELL_TREE_WORD[something.spellTreeID]
@@ -469,7 +523,11 @@ local AddHybridDamageAnalysis = function(tooltip, data, prefix)
     local spellPowerDamage = (data.dot and data.dot.spellPowerDamage or 0) +
         (data.flat and data.flat.spellPowerDamage or 0) +
         (data.range and data.range.spellPowerDamage or 0)
-    tooltip:AddLine("Hybrid:")
+    if header == true or header == nil then
+        tooltip:AddLine("Combined:")
+    else
+        tooltip:AddLine(header)
+    end
     tooltip:AddLine(
         __(
             "${prefix}Deals ${colorDamage}${damage}${colorReset} combined ${spellColor}${spellWord}${colorReset} damage.",
@@ -499,7 +557,7 @@ local AddHybridDamageAnalysis = function(tooltip, data, prefix)
     if spellPower > 0 then
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${flatBonus} damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${flatBonus}${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
@@ -513,7 +571,7 @@ local AddHybridDamageAnalysis = function(tooltip, data, prefix)
         )
         tooltip:AddLine(
             __(
-                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${spellPowerBenefit}% damage.",
+                "${prefix}${spellColor}${spellPower} ${spellWord}${colorReset} spell power added ${colorDamage}${spellPowerBenefit}%${colorReset} damage.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     spellPower = spellPower,
@@ -526,17 +584,12 @@ local AddHybridDamageAnalysis = function(tooltip, data, prefix)
             unpack(RGB.WHITE)
         )
     end
-
-    -- add individual analysis
-    if data.flat then AddDamageAnalysis(tooltip, data.flat, prefix) end
-    if data.range then AddDamageRangeAnalysis(tooltip, data.range, prefix) end
-    if data.dot then AddDamageOverTimeAnalysis(tooltip, data.dot, prefix) end
 end
 
 ---@param tooltip GameTooltip
 ---@param data SpellMixin
 ---@param prefix string|nil
-local AddPowerAnalysis = function(tooltip, data, prefix)
+local AddPowerAnalysis = function(tooltip, data, prefix, header)
     local something = data.flat or data.dot or data.range
     if not something then return end
     local spellPowerType = something.spellPowerType
@@ -545,7 +598,12 @@ local AddPowerAnalysis = function(tooltip, data, prefix)
     local empoweredDamage = (data.dot and data.dot.empoweredDamage or 0) + (data.flat and data.flat.empoweredDamage or 0) +
         (data.range and data.range.empoweredAvg or 0)
     local damagePerPower = something.spellPowerCost / empoweredDamage
-    tooltip:AddLine("Power:")
+    local powerPerDamage = empoweredDamage / something.spellPowerCost
+    if header == true or header == nil then
+        tooltip:AddLine("Power:")
+    else
+        tooltip:AddLine(header)
+    end
     tooltip:AddLine(
         __("${prefix}Costs ${powerTypeColor}${cost} ${powerTypeWord}${colorReset} per point of damage.", {
             prefix = prefix or STRING.DEFAULT_PREFIX,
@@ -561,41 +619,11 @@ local AddPowerAnalysis = function(tooltip, data, prefix)
             prefix = prefix or STRING.DEFAULT_PREFIX,
             powerTypeColor = powerTypeColor,
             powerTypeWord = powerTypeWord,
-            cost = ShortFloat((1 - (damagePerPower - 1)) * 100, 2),
+            cost = ShortFloat(powerPerDamage * 100, 2),
             colorReset = COLOR.RESET
         }),
         255,
         255, 255)
-end
-
--- simplifies finding text in a tooltip
--- this may be super unnecessary
--- also stores last tooltip region data to avoid unnecessary work in the same call
-local lastTooltip, lastTooltipRegions = nil, {}
-local FindTextInTooltip = function(tooltip, pattern)
-    -- handle saved region data
-    local regions
-    if lastTooltip == tooltip then
-        regions = lastTooltipRegions
-    else -- generate new regions
-        regions = { tooltip:GetRegions() }
-        lastTooltip = tooltip
-        lastTooltipRegions = regions
-    end
-
-    -- iterate over regions with text
-    for k, v in pairs(regions) do
-        if v and v:GetObjectType() == "FontString" then
-            local text = v:GetText()
-            if text then
-                -- check for matches and return them
-                local result = { string.match(v:GetText(), pattern) }
-                if result[1] then
-                    return unpack(result)
-                end
-            end
-        end
-    end
 end
 
 -- throw-away listener frame
@@ -635,6 +663,7 @@ SPELL_ANALYSIS.STRING                     = STRING
 SPELL_ANALYSIS.FindTextInTooltip          = FindTextInTooltip
 SPELL_ANALYSIS.ReverseLookupTable         = ReverseLookupTable
 SPELL_ANALYSIS.ShortFloat                 = ShortFloat
+SPELL_ANALYSIS.__                         = __
 
 -- etc
 SPELL_ANALYSIS.AnalyzeFlatDamageSpell     = AnalyzeFlatDamageSpell
@@ -642,7 +671,7 @@ SPELL_ANALYSIS.AnalyzeDamageRangeSpell    = AnalyzeDamageRangeSpell
 SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell = AnalyzeDamageOverTimeSpell
 
 -- export analysis and display functions
-SPELL_ANALYSIS.AddDamageAnalysis          = AddDamageAnalysis
+SPELL_ANALYSIS.AddDamageAnalysis          = AddFlatDamageAnalysis
 SPELL_ANALYSIS.AddDamageRangeAnalysis     = AddDamageRangeAnalysis
 SPELL_ANALYSIS.AddDamageOverTimeAnalysis  = AddDamageOverTimeAnalysis
 SPELL_ANALYSIS.AddPowerAnalysis           = AddPowerAnalysis

@@ -5,25 +5,28 @@
 ## Notes: Damage and efficiency analysis for spells.
 ## DefaultState: Enabled
 
-# setup stuff
-interp.lua
-
 # generates entry points and tables and some functions
 index.lua
 
-# rogue spells
+# Rogue spells
 rogue/sinister-strike.lua
 rogue/eviscerate.lua
 rogue/backstab.lua
 
-# warlock spells
+# Warlock spells
 warlock/immolate.lua
 warlock/curse-of-agony.lua
 warlock/corruption.lua
 warlock/shadow-bolt.lua
 warlock/searing-pain.lua
 warlock/drain-life.lua
+warlock/drain-soul.lua
 
-# eviscerate
+# Mage spells
+mage/fireball.lua
+mage/frostbolt.lua
+mage/fire-blast.lua
+
+# Generic spells
 etc/shoot.lua
 etc/throw.lua
