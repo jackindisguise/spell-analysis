@@ -416,22 +416,6 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
         tooltip:AddLine(header)
     end
     tooltip:AddLine(
-        __("${prefix}Ticks once every ${tickDelay} seconds.",
-            {
-                prefix = prefix or STRING.DEFAULT_PREFIX,
-                tickDelay = data.duration / data.ticks
-            }),
-        unpack(RGB.WHITE)
-    )
-    tooltip:AddLine(
-        __("${prefix}Ticks a total of ${ticks} times.",
-            {
-                prefix = prefix or STRING.DEFAULT_PREFIX,
-                ticks = data.ticks
-            }),
-        unpack(RGB.WHITE)
-    )
-    tooltip:AddLine(
         __(
             "${prefix}Deals ${colorDamage}${damage}${colorReset} total ${spellColor}${spellWord}${colorReset} damage.",
             {
@@ -453,6 +437,17 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
                 spellColor = spellTreeColor,
                 spellWord = spellTreeWord,
                 colorReset = COLOR.RESET
+            }),
+        unpack(RGB.WHITE)
+    )
+    local tickDelay = data.duration / data.ticks
+    tooltip:AddLine(
+        __("${prefix}Ticks ${ticks} times, once every ${tickDelay} ${seconds}.",
+            {
+                prefix = prefix or STRING.DEFAULT_PREFIX,
+                ticks = data.ticks,
+                tickDelay = tickDelay,
+                seconds = tickDelay == 1 and "second" or "seconds"
             }),
         unpack(RGB.WHITE)
     )
