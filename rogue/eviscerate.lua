@@ -52,7 +52,7 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     tooltip:AddLine(__("${attackPower} Attack Power adds ${colorRed}${attackPowerDamage}${colorReset} bonus damage.", {
         colorRed = COLOR.DAMAGE,
         colorReset = COLOR.RESET,
-        attackPower = attackPower,
+        attackPower = totalAttackPower,
         attackPowerDamage = attackPowerDamage
     }), 255, 255, 255)
     tooltip:AddLine(
@@ -61,7 +61,7 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
             {
                 colorRed = COLOR.DAMAGE,
                 colorReset = COLOR.RESET,
-                attackPower = attackPower,
+                attackPower = totalAttackPower,
                 attackPowerOne = ShortFloat(attackPowerDamage / avg[1] * 100, 1),
                 attackPowerTwo = ShortFloat(attackPowerDamage / avg[2] * 100, 1),
                 attackPowerThree = ShortFloat(attackPowerDamage / avg[3] * 100, 1),
