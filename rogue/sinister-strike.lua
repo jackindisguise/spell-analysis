@@ -5,7 +5,7 @@ local SPELL_NAME               = "Sinister Strike"
 --- I've kind of realized that there is another way to analyze these spells.
 --- You regenerate 10 energy per second.
 --- This spell costs 45 energy.
---- That means you can use this spell every 4.5 seconds.
+--- That means you can use this spell every 4.5 seconds (though you can use it 2 times instantly).
 --- That means its DPS is effectively damage / 4.5.
 --- This presents a complex question about certain systems in the game
 --- and how they tie into damage analysis, which pisses me off a lot.
