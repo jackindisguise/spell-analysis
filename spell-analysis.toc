@@ -32,6 +32,11 @@ priest/mind-blast.lua
 priest/smite.lua
 priest/shadow-word-pain.lua
 
+# Hunter spells
+hunter/raptor-strike.lua
+hunter/arcane-shot.lua
+hunter/serpent-sting.lua
+
 # Generic spells
 etc/shoot.lua
 etc/throw.lua
