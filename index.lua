@@ -1,5 +1,12 @@
 local GCD = select(2, UnitClass("player")) == "ROGUE" and 1 or 1.5
 
+-- Iterate through the provided table and add keys for each value that refer to their keys.
+-- Basically reverses the dictionary of the table, but retains both in one table.
+local ReverseLookupTable = function(t)
+    for k, v in pairs(t) do t[v] = k end
+    return t
+end
+
 -- quick reference
 -- RGB colors
 local RGB = {
@@ -30,7 +37,6 @@ local COLOR = {
 
 -- spell tree IDs
 local SPELL_TREE_ID = {
-    UNKNOWN = 0,
     PHYSICAL = 1,
     HOLY = 2,
     FIRE = 3,
@@ -51,7 +57,7 @@ local SPELL_TREE_WORD = {
     "Arcane"
 }
 
-SPELL_TREE_WORD[0] = "Unknown"
+local SPELL_TREE_WORD2ID = ReverseLookupTable(SPELL_TREE_WORD)
 
 -- common colors for spell tree words
 local SPELL_TREE_COLOR = {
@@ -96,12 +102,6 @@ local STRING = {
     DEFAULT_PREFIX = " * "
 }
 
--- Iterate through the provided table and add keys for each value that refer to their keys.
--- Basically reverses the dictionary of the table, but retains both in one table.
-local ReverseLookupTable = function(t)
-    for k, v in pairs(t) do t[v] = k end
-    return t
-end
 
 -- Display a number as a float with the provided precision, but removes unnecessary 0s from the end.
 local ShortFloat = function(n, precision)
@@ -117,17 +117,8 @@ end
 -- Stores the last tooltip region data to avoid unnecessary work in the same call.
 local lastTooltip, lastTooltipRegions = nil, {}
 local FindTextInTooltip = function(tooltip, pattern)
-    -- handle saved region data
-    local regions
-    if lastTooltip == tooltip then
-        regions = lastTooltipRegions
-    else -- generate new regions
-        regions = { tooltip:GetRegions() }
-        lastTooltip = tooltip
-        lastTooltipRegions = regions
-    end
-
     -- iterate over regions with text
+    local regions = { tooltip:GetRegions() }
     for k, v in pairs(regions) do
         if v and v:GetObjectType() == "FontString" then
             local text = v:GetText()
@@ -428,18 +419,6 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
             }),
         unpack(RGB.WHITE)
     )
-    tooltip:AddLine(
-        __("${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per tick.",
-            {
-                prefix = prefix or STRING.DEFAULT_PREFIX,
-                colorDamage = COLOR.DAMAGE,
-                damage = ShortFloat(data.empoweredDamagePerTick, 1),
-                spellColor = spellTreeColor,
-                spellWord = spellTreeWord,
-                colorReset = COLOR.RESET
-            }),
-        unpack(RGB.WHITE)
-    )
     local tickDelay = data.duration / data.ticks
     tooltip:AddLine(
         __("${prefix}Ticks ${ticks} times, once every ${tickDelay} ${seconds}.",
@@ -450,17 +429,15 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
                 seconds = tickDelay == 1 and "second" or "seconds"
             }),
         unpack(RGB.WHITE)
-    )
-
-    -- don't bother showing this if ticks == duration
+    ) -- don't bother showing this if ticks == duration
     if data.delayTime ~= data.ticks then
         tooltip:AddLine(
             __(
-                "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per second.",
+                "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per tick.",
                 {
                     prefix = prefix or STRING.DEFAULT_PREFIX,
                     colorDamage = COLOR.DAMAGE,
-                    damage = ShortFloat(data.empoweredDPS, 1),
+                    damage = ShortFloat(data.empoweredDamagePerTick, 1),
                     spellColor = spellTreeColor,
                     spellWord = spellTreeWord,
                     colorReset = COLOR.RESET
@@ -468,6 +445,21 @@ local AddDamageOverTimeAnalysis = function(tooltip, data, prefix, header)
             unpack(RGB.WHITE)
         )
     end
+
+
+    tooltip:AddLine(
+        __(
+            "${prefix}Deals ${colorDamage}${damage}${colorReset} ${spellColor}${spellWord}${colorReset} damage per second.",
+            {
+                prefix = prefix or STRING.DEFAULT_PREFIX,
+                colorDamage = COLOR.DAMAGE,
+                damage = ShortFloat(data.empoweredDPS, 1),
+                spellColor = spellTreeColor,
+                spellWord = spellTreeWord,
+                colorReset = COLOR.RESET
+            }),
+        unpack(RGB.WHITE)
+    )
 
     if spellPower > 0 then
         tooltip:AddLine(
@@ -657,6 +649,7 @@ SPELL_ANALYSIS.RGB                        = RGB
 SPELL_ANALYSIS.COLOR                      = COLOR
 SPELL_ANALYSIS.SPELL_TREE_ID              = SPELL_TREE_ID
 SPELL_ANALYSIS.SPELL_TREE_WORD            = SPELL_TREE_WORD
+SPELL_ANALYSIS.SPELL_TREE_WORD2ID         = SPELL_TREE_WORD2ID
 SPELL_ANALYSIS.SPELL_TREE_COLOR           = SPELL_TREE_COLOR
 SPELL_ANALYSIS.SPELL_POWER_TYPE           = SPELL_POWER_TYPE
 SPELL_ANALYSIS.SPELL_POWER_COLOR          = SPELL_POWER_COLOR
