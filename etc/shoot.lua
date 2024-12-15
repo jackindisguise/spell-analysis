@@ -3,24 +3,18 @@ local SPELL_NAME              = "Shoot"
 
 -- local alias
 local SPELL_TREE_WORD2ID      = SPELL_ANALYSIS.SPELL_TREE_WORD2ID
-local FindTextInTooltip       = SPELL_ANALYSIS.FindTextInTooltip
-local SPELL_TREE_ID           = SPELL_ANALYSIS.SPELL_TREE_ID
 local SPELL_POWER_TYPE        = SPELL_ANALYSIS.SPELL_POWER_TYPE
-local ReverseLookupTable      = SPELL_ANALYSIS.ReverseLookupTable
 local AnalyzeDamageRangeSpell = SPELL_ANALYSIS.AnalyzeDamageRangeSpell
 local AddDamageRangeAnalysis  = SPELL_ANALYSIS.AddDamageRangeAnalysis
-local AddPowerAnalysis        = SPELL_ANALYSIS.AddPowerAnalysis
-
--- colors
-local COLOR_DAMAGE            = "|cFFFF4040"
-local COLOR_RESET             = "|r"
 
 -- once i figure out how to determine the damage-type of the wands, I'll fix this
+-- i tried reallly hard to get this to work in a more elegant way
+-- i ended up stealing this off a forum post from like 2012
 local tt                      = CreateFrame("GameTooltip", "CAKE", UIParent, "GameTooltipTemplate")
-local DamageTypeText          = CAKETextLeft4
+local DamageTypeText          = _G["CAKETextLeft4"]
 function GetWandDamageType()
     tt:SetOwner(UIParent, "ANCHOR_NONE")
-    tt:SetInventoryItem("player", 18)
+    local _ = tt:SetInventoryItem("player", 18)
     local n = DamageTypeText:GetText()
     tt:Hide()
     return SPELL_TREE_WORD2ID[string.match(n, "%d+ %- %d+ (.+) Damage")]
