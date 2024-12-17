@@ -1,5 +1,6 @@
 -- spell name
-local SPELL_NAME               = "Shoot"
+local SPELL_NAME               = "Throw"
+local SPELL_ALIASES            = { "Shoot Crossbow", "Shoot Bow" }
 
 -- local alias
 local SPELL_TREE_WORD2ID       = SPELL_ANALYSIS.SPELL_TREE_WORD2ID
@@ -35,4 +36,9 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
         0, 0)
 
     AddDamageRangeAnalysis(tooltip, result)
+end
+
+-- listener for aliases
+for k, v in pairs(SPELL_ALIASES) do
+    SPELL_ANALYSIS.FUN[v] = SPELL_ANALYSIS.FUN[SPELL_NAME]
 end
