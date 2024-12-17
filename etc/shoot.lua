@@ -35,18 +35,8 @@ SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
     -- add line
     tooltip:AddLine("\n")
 
-    --[[
-    tooltip:AddLine(
-        string.format("Deals %s%s%s damage on average.", COLOR_DAMAGE, ShortFloat(avgDmg, 2), COLOR_RESET),
-        255,
-        255, 255)
-    tooltip:AddLine(
-        string.format("Deals %s%s%s damage per second.", COLOR_DAMAGE, ShortFloat(avgDmg / speed, 2), COLOR_RESET),
-        255,
-        255, 255)]]
-
     -- analyze dat shit
-    local result = AnalyzeDamageRangeSpell(lowDmg, hiDmg, 0, 0, spellTreeID, SPELL_POWER_TYPE.MANA,
+    local result = AnalyzeDamageRangeSpell(lowDmg, hiDmg, speed, 0, spellTreeID, SPELL_POWER_TYPE.MANA,
         0, 0)
 
     AddDamageRangeAnalysis(tooltip, result)

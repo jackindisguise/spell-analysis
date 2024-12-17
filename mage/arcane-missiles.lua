@@ -1,14 +1,5 @@
 -- spell name
-local SPELL_NAME = "Drain Life"
-
---[[
---- TODO:
---- This is a spell that does damage and heals.
---- Add healing to metrics for determining the value of things.
---- It might be worthwhile to combine damage and healing into 1 number.
---- Though that reduces the amount of information we have for analysis later on.
---- I'll think about it.
-]]
+local SPELL_NAME                 = "Arcane Missiles"
 
 -- local alias
 local FindTextInTooltip          = SPELL_ANALYSIS.FindTextInTooltip
@@ -20,9 +11,8 @@ local AddDamageOverTimeAnalysis  = SPELL_ANALYSIS.AddDamageOverTimeAnalysis
 local AddPowerAnalysis           = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 689, 699, 709, 7651, 11699, 11700 })
-local RANK_COEFF_TABLE           = { 0.078, 0.1, 0.1, 0.1, 0.1, 0.1 }
-local DOT_TICKS                  = 5
+local SPELL_ID                   = ReverseLookupTable({ 5143, 5144, 5145, 8416, 8417, 10211, 10212, 25345 })
+local RANK_COEFF_TABLE           = { 0.132, 0.204, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24 }
 
 -- listener for this spell
 SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
@@ -30,11 +20,10 @@ SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
     local coeff = RANK_COEFF_TABLE[spellRank]
-    local ticks = DOT_TICKS
 
     -- calculate damage
     local damagePattern =
-    "Transfers (%d+) health every second from the target to the caster.  Lasts (%d+) sec."
+    "Launches Arcane Missiles at the enemy, causing (%d+) Arcane damage each second for (%d+) sec."
     local DOTDam, DOTDuration = FindTextInTooltip(tooltip, damagePattern)
 
     -- calculcate mana efficiency
@@ -42,8 +31,8 @@ SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
     local cost = FindTextInTooltip(tooltip, costPattern)
 
     -- do stuff
-    local result = AnalyzeDamageOverTimeSpell(DOTDam * DOTDuration, DOTDuration, ticks, DOTDuration, 0,
-        SPELL_TREE_ID.SHADOW,
+    local result = AnalyzeDamageOverTimeSpell(DOTDam * DOTDuration, DOTDuration, DOTDuration, DOTDuration, 0,
+        SPELL_TREE_ID.ARCANE,
         SPELL_POWER_TYPE.MANA, cost, coeff)
 
     -- add line

@@ -1,14 +1,5 @@
 -- spell name
-local SPELL_NAME = "Drain Life"
-
---[[
---- TODO:
---- This is a spell that does damage and heals.
---- Add healing to metrics for determining the value of things.
---- It might be worthwhile to combine damage and healing into 1 number.
---- Though that reduces the amount of information we have for analysis later on.
---- I'll think about it.
-]]
+local SPELL_NAME                 = "Rain of Fire"
 
 -- local alias
 local FindTextInTooltip          = SPELL_ANALYSIS.FindTextInTooltip
@@ -17,37 +8,37 @@ local SPELL_POWER_TYPE           = SPELL_ANALYSIS.SPELL_POWER_TYPE
 local ReverseLookupTable         = SPELL_ANALYSIS.ReverseLookupTable
 local AnalyzeDamageOverTimeSpell = SPELL_ANALYSIS.AnalyzeDamageOverTimeSpell
 local AddDamageOverTimeAnalysis  = SPELL_ANALYSIS.AddDamageOverTimeAnalysis
+local AddAreaDamageAnalysis      = SPELL_ANALYSIS.AddAreaDamageAnalysis
 local AddPowerAnalysis           = SPELL_ANALYSIS.AddPowerAnalysis
 
 -- spell stuff
-local SPELL_ID                   = ReverseLookupTable({ 689, 699, 709, 7651, 11699, 11700 })
-local RANK_COEFF_TABLE           = { 0.078, 0.1, 0.1, 0.1, 0.1, 0.1 }
-local DOT_TICKS                  = 5
+local SPELL_ID                   = ReverseLookupTable({ 5740, 6219, 11677, 11678 })
+local COEFF                      = 0.083
+local DOT_TICKS                  = 4
 
 -- listener for this spell
 SPELL_ANALYSIS.FUN[SPELL_NAME]   = function(tooltip)
     -- hard data
     local name, id = tooltip:GetSpell()
     local spellRank = SPELL_ID[id]
-    local coeff = RANK_COEFF_TABLE[spellRank]
+    local coeff = COEFF
     local ticks = DOT_TICKS
 
     -- calculate damage
     local damagePattern =
-    "Transfers (%d+) health every second from the target to the caster.  Lasts (%d+) sec."
-    local DOTDam, DOTDuration = FindTextInTooltip(tooltip, damagePattern)
+    "Calls down a fiery rain to burn enemies in the area of effect for (%d+) Fire damage over (%d+) sec."
+    local DOTDam, channelDuration = FindTextInTooltip(tooltip, damagePattern)
 
     -- calculcate mana efficiency
     local costPattern = "(%d+) Mana"
     local cost = FindTextInTooltip(tooltip, costPattern)
 
     -- do stuff
-    local result = AnalyzeDamageOverTimeSpell(DOTDam * DOTDuration, DOTDuration, ticks, DOTDuration, 0,
-        SPELL_TREE_ID.SHADOW,
+    local result = AnalyzeDamageOverTimeSpell(DOTDam, channelDuration, ticks, channelDuration, 0, SPELL_TREE_ID.FIRE,
         SPELL_POWER_TYPE.MANA, cost, coeff)
 
     -- add line
     tooltip:AddLine("\n")
-    AddDamageOverTimeAnalysis(tooltip, result)
+    AddAreaDamageAnalysis(tooltip, { dot = result })
     AddPowerAnalysis(tooltip, { dot = result })
 end

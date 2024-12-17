@@ -8,6 +8,10 @@
 # generates entry points and tables and some functions
 index.lua
 
+# Warror spells
+warrior/heroic-strike.lua
+warrior/rend.lua
+
 # Rogue spells
 rogue/sinister-strike.lua
 rogue/eviscerate.lua
@@ -21,11 +25,13 @@ warlock/shadow-bolt.lua
 warlock/searing-pain.lua
 warlock/drain-life.lua
 warlock/drain-soul.lua
+warlock/rain-of-fire.lua
 
 # Mage spells
 mage/fireball.lua
 mage/frostbolt.lua
 mage/fire-blast.lua
+mage/arcane-missiles.lua
 
 # Priest spells
 priest/mind-blast.lua
@@ -36,6 +42,9 @@ priest/shadow-word-pain.lua
 hunter/raptor-strike.lua
 hunter/arcane-shot.lua
 hunter/serpent-sting.lua
+
+# Shaman spells
+shaman/lightning-bolt.lua
 
 # Generic spells
 etc/shoot.lua
