@@ -22,9 +22,6 @@ end
 
 -- listener for this spell
 SPELL_ANALYSIS.FUN[SPELL_NAME] = function(tooltip)
-    -- hard data
-    local name, id = tooltip:GetSpell()
-
     -- calculate damage
     local speed, lowDmg, hiDmg = UnitRangedDamage("player");
     if speed == 0 then return end
