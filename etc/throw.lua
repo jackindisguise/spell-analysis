@@ -1,6 +1,6 @@
 -- spell name
 local SPELL_NAME               = "Throw"
-local SPELL_ALIASES            = { "Shoot Crossbow", "Shoot Bow" }
+local SPELL_ALIASES            = { "Shoot Crossbow", "Shoot Bow", "Auto Shot" }
 
 -- local alias
 local SPELL_TREE_ID            = SPELL_ANALYSIS.SPELL_TREE_ID
