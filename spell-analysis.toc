@@ -32,6 +32,7 @@ mage/fireball.lua
 mage/frostbolt.lua
 mage/fire-blast.lua
 mage/arcane-missiles.lua
+mage/arcane-explosion.lua
 
 # Priest spells
 priest/mind-blast.lua
@@ -47,5 +48,6 @@ hunter/serpent-sting.lua
 shaman/lightning-bolt.lua
 
 # Generic spells
+etc/attack.lua
 etc/shoot.lua
 etc/throw.lua
