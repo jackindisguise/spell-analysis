@@ -1,4 +1,9 @@
 {
+  "format.defaultConfig": {
+    "end_statement_with_semicolon": "always",
+    "indent_style": "tab",
+    "align_continuous_assign_statement": "false"
+  },
   "diagnostics.globals": [
     "arg",
     "arg1",
