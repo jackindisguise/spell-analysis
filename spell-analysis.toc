@@ -33,6 +33,7 @@ mage/frostbolt.lua
 mage/fire-blast.lua
 mage/arcane-missiles.lua
 mage/arcane-explosion.lua
+mage/scorch.lua
 
 # Priest spells
 priest/mind-blast.lua
